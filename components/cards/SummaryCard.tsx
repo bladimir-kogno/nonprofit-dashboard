@@ -7,9 +7,9 @@ type SummaryCardProps = {
 
 export default function SummaryCard({ title, value }: SummaryCardProps) {
     return (
-        <div className="bg-white border rounded-md p-4 shadow-sm">
-            <div className="text-sm text-gray-500">{title}</div>
-            <div className="text-2xl font-bold mt-1">{value}</div>
+        <div className="bg-white rounded-md shadow-sm p-4 border">
+            <p className="text-sm text-gray-500">{title}</p>
+            <p className="text-2xl font-bold mt-1">{value}</p>
         </div>
     );
 }
