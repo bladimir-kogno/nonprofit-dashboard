@@ -2,31 +2,38 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { BarChart3, Heart, Users, Calendar, FileText, Mail } from 'lucide-react';
 
 const navItems = [
-    { label: 'Dashboard', href: '/' },
-    { label: 'Donors', href: '/donors' },
-    { label: 'Volunteers', href: '/volunteers' },
-    { label: 'Events', href: '/events' },
-    { label: 'Reports', href: '/reports' },
+    { label: 'Dashboard', href: '/', icon: BarChart3 },
+    { label: 'Donors', href: '/donors', icon: Heart },
+    { label: 'Volunteers', href: '/volunteers', icon: Users },
+    { label: 'Events', href: '/events', icon: Calendar },
+    { label: 'Email & Newsletter', href: '/emails', icon: Mail },
+    { label: 'Reports', href: '/reports', icon: FileText },
 ];
 
-export default function TopNav() {
+export default function SideNav() {
     const pathname = usePathname();
 
     return (
-        <nav className="bg-white border-b shadow-sm px-6 py-3 flex gap-6 text-sm font-medium">
-            {navItems.map(({ label, href }) => (
-                <Link
-                    key={href}
-                    href={href}
-                    className={`py-1 hover:text-blue-600 ${
-                        pathname === href ? 'text-blue-600' : 'text-gray-800'
-                    }`}
-                >
-                    {label}
-                </Link>
-            ))}
-        </nav>
+        <div className="lg:w-64">
+            <nav className="space-y-2">
+                {navItems.map(({ label, href, icon: Icon }) => (
+                    <Link
+                        key={href}
+                        href={href}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                            pathname === href
+                                ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                : 'text-gray-600 hover:bg-gray-50'
+                        }`}
+                    >
+                        <Icon className="h-5 w-5" />
+                        {label}
+                    </Link>
+                ))}
+            </nav>
+        </div>
     );
 }
