@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { Plus, Edit2, Trash2, Send, Mail, MessageCircle, Settings, Users, Calendar } from 'lucide-react';
 import Modal from '../../components/shared/Modal';
+import HTMLEditor from '../../components/shared/HTMLEditor';
 
 interface EmailTemplate {
     id: number;
     name: string;
     subject: string;
     content: string;
+    htmlContent: string;
     type: 'welcome' | 'donation_ack' | 'newsletter' | 'event_reminder' | 'thank_you';
 }
 
@@ -17,6 +19,7 @@ interface Newsletter {
     title: string;
     subject: string;
     content: string;
+    htmlContent: string;
     status: 'Draft' | 'Scheduled' | 'Sent';
     recipients: number;
     created: string;
@@ -41,6 +44,7 @@ export default function EmailsPage() {
             title: 'July 2024 Newsletter', 
             subject: 'Summer Updates & Upcoming Events', 
             content: 'Summer has been busy for us with amazing community outreach...', 
+            htmlContent: '<h1>Summer Updates & Upcoming Events</h1><p>Summer has been busy for us with amazing community outreach...</p>', 
             status: 'Draft', 
             recipients: 0, 
             created: '2024-07-01' 
@@ -50,6 +54,7 @@ export default function EmailsPage() {
             title: 'June 2024 Newsletter', 
             subject: 'Community Impact Report', 
             content: 'We are proud to share our impact from this past month...', 
+            htmlContent: '<h1>Community Impact Report</h1><p>We are proud to share our impact from this past month...</p>', 
             status: 'Sent', 
             recipients: 156, 
             created: '2024-06-01' 
@@ -62,6 +67,7 @@ export default function EmailsPage() {
             name: 'Donation Thank You', 
             subject: 'Thank you for your generous donation!', 
             content: 'Dear [DONOR_NAME], Thank you so much for your generous donation of $[AMOUNT]. Your support means the world to us...', 
+            htmlContent: '<h2>Thank You for Your Generous Donation!</h2><p>Dear <strong>[DONOR_NAME]</strong>,</p><p>Thank you so much for your generous donation of <strong>$[AMOUNT]</strong>. Your support means the world to us and helps us continue our mission to make a positive impact in our community.</p><p>With gratitude,<br>The Nonprofit Team</p>', 
             type: 'donation_ack' 
         },
         { 
@@ -69,6 +75,7 @@ export default function EmailsPage() {
             name: 'Welcome New Donor', 
             subject: 'Welcome to Our Nonprofit Family!', 
             content: 'Dear [DONOR_NAME], Welcome to our community! We are thrilled to have you join our mission...', 
+            htmlContent: '<h2>Welcome to Our Nonprofit Family!</h2><p>Dear <strong>[DONOR_NAME]</strong>,</p><p>Welcome to our community! We are thrilled to have you join our mission to create positive change. Your support helps us reach more people and make a greater impact.</p><ul><li>Stay updated with our monthly newsletter</li><li>Join our volunteer opportunities</li><li>Attend our community events</li></ul><p>Thank you for being part of our journey!</p>', 
             type: 'welcome' 
         },
         { 
@@ -76,6 +83,7 @@ export default function EmailsPage() {
             name: 'Event Reminder', 
             subject: 'Don\'t Forget - [EVENT_NAME] is Tomorrow!', 
             content: 'Hello [NAME], This is a friendly reminder about [EVENT_NAME] happening tomorrow at [TIME]...', 
+            htmlContent: '<h2>Event Reminder: [EVENT_NAME]</h2><p>Hello <strong>[NAME]</strong>,</p><p>This is a friendly reminder about <strong>[EVENT_NAME]</strong> happening tomorrow!</p><div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;"><p><strong>When:</strong> [DATE] at [TIME]</p><p><strong>Where:</strong> [LOCATION]</p></div><p>We look forward to seeing you there!</p>', 
             type: 'event_reminder' 
         }
     ]);
@@ -108,6 +116,37 @@ export default function EmailsPage() {
     const [modalType, setModalType] = useState<'newsletter' | 'template' | 'automation'>('newsletter');
     const [editingItem, setEditingItem] = useState<any>(null);
     const [formData, setFormData] = useState<any>({});
+    const [sending, setSending] = useState(false);
+
+    // Email sending function
+    const sendEmail = async (emailData: any) => {
+        try {
+            setSending(true);
+            const response = await fetch('/api/send-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(emailData),
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                alert(`Email sent successfully! ${result.preview ? `Preview: ${result.preview}` : ''}`);
+                return true;
+            } else {
+                alert(`Failed to send email: ${result.error}`);
+                return false;
+            }
+        } catch (error) {
+            console.error('Error sending email:', error);
+            alert('Failed to send email. Please try again.');
+            return false;
+        } finally {
+            setSending(false);
+        }
+    };
 
     const openModal = (type: 'newsletter' | 'template' | 'automation', item: any = null) => {
         setModalType(type);
@@ -116,9 +155,9 @@ export default function EmailsPage() {
             setFormData(item);
         } else {
             if (type === 'newsletter') {
-                setFormData({ title: '', subject: '', content: '', status: 'Draft' });
+                setFormData({ title: '', subject: '', content: '', htmlContent: '', status: 'Draft' });
             } else if (type === 'template') {
-                setFormData({ name: '', subject: '', content: '', type: 'welcome' });
+                setFormData({ name: '', subject: '', content: '', htmlContent: '', type: 'welcome' });
             } else if (type === 'automation') {
                 setFormData({ name: '', trigger: 'new_donor', template: '', active: true });
             }
@@ -186,14 +225,34 @@ export default function EmailsPage() {
         }
     };
 
-    const sendNewsletter = (newsletterId: number) => {
-        const totalRecipients = 156; // Mock number - would come from donor + volunteer count
-        setNewsletters(newsletters.map(n => 
-            n.id === newsletterId 
-                ? { ...n, status: 'Sent' as const, recipients: totalRecipients }
-                : n
-        ));
-        alert(`Newsletter sent to ${totalRecipients} recipients!`);
+    const sendNewsletter = async (newsletterId: number) => {
+        const newsletter = newsletters.find(n => n.id === newsletterId);
+        if (!newsletter) return;
+
+        // Mock recipient emails - in production, get from database
+        const recipients = [
+            'donor1@example.com',
+            'donor2@example.com',
+            'volunteer1@example.com'
+        ];
+
+        const emailData = {
+            to: recipients,
+            subject: newsletter.subject,
+            htmlContent: newsletter.htmlContent,
+            type: 'newsletter'
+        };
+
+        const success = await sendEmail(emailData);
+        
+        if (success) {
+            const totalRecipients = recipients.length;
+            setNewsletters(newsletters.map(n => 
+                n.id === newsletterId 
+                    ? { ...n, status: 'Sent' as const, recipients: totalRecipients }
+                    : n
+            ));
+        }
     };
 
     const toggleAutomation = (id: number) => {
@@ -508,14 +567,16 @@ export default function EmailsPage() {
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 required
                             />
-                            <textarea
-                                placeholder="Newsletter Content"
-                                value={formData.content || ''}
-                                onChange={(e) => setFormData({...formData, content: e.target.value})}
-                                rows={6}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                required
-                            />
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Newsletter Content (HTML)
+                                </label>
+                                <HTMLEditor
+                                    content={formData.htmlContent || ''}
+                                    onChange={(html) => setFormData({...formData, htmlContent: html, content: html.replace(/<[^>]*>/g, '')})}
+                                    placeholder="Write your newsletter content here..."
+                                />
+                            </div>
                         </>
                     )}
 
@@ -550,14 +611,16 @@ export default function EmailsPage() {
                                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                                 required
                             />
-                            <textarea
-                                placeholder="Email Content (use [DONOR_NAME], [AMOUNT], etc. for variables)"
-                                value={formData.content || ''}
-                                onChange={(e) => setFormData({...formData, content: e.target.value})}
-                                rows={6}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                                required
-                            />
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Email Template Content (HTML)
+                                </label>
+                                <HTMLEditor
+                                    content={formData.htmlContent || ''}
+                                    onChange={(html) => setFormData({...formData, htmlContent: html, content: html.replace(/<[^>]*>/g, '')})}
+                                    placeholder="Write your email template here... Use variables like [DONOR_NAME], [AMOUNT], etc."
+                                />
+                            </div>
                         </>
                     )}
 
