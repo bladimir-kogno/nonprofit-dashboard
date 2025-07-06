@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Send, Mail, MessageCircle, Settings, Users, Calendar } from 'lucide-react';
+import { Plus, Edit2, Trash2, Send, Mail, MessageCircle, Settings, Users, Calendar, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import Modal from '../../components/shared/Modal';
 import HTMLEditor from '../../components/shared/HTMLEditor';
 
@@ -36,6 +36,7 @@ interface AutomatedEmail {
 
 export default function EmailsPage() {
     const [activeTab, setActiveTab] = useState<'newsletters' | 'templates' | 'automation'>('newsletters');
+    const [expandedNewsletter, setExpandedNewsletter] = useState<number | null>(null);
     
     // Sample data
     const [newsletters, setNewsletters] = useState<Newsletter[]>([
@@ -43,8 +44,8 @@ export default function EmailsPage() {
             id: 1, 
             title: 'July 2024 Newsletter', 
             subject: 'Summer Updates & Upcoming Events', 
-            content: 'Summer has been busy for us with amazing community outreach...', 
-            htmlContent: '<h1>Summer Updates & Upcoming Events</h1><p>Summer has been busy for us with amazing community outreach...</p>', 
+            content: 'Summer has been busy for us with amazing community outreach projects and successful fundraising events. We\'ve reached over 500 families this month with our food assistance program, and our youth mentorship program has expanded to include 50 new participants. Thank you to all our dedicated volunteers who make this possible!', 
+            htmlContent: '<h1>Summer Updates & Upcoming Events</h1><p>Summer has been busy for us with amazing community outreach projects and successful fundraising events. We\'ve reached over 500 families this month with our food assistance program, and our youth mentorship program has expanded to include 50 new participants.</p><h2>Upcoming Events</h2><ul><li>Community BBQ - August 15th</li><li>Volunteer Training - August 20th</li><li>Fundraising Gala - September 10th</li></ul><p>Thank you to all our dedicated volunteers who make this possible!</p>', 
             status: 'Draft', 
             recipients: 0, 
             created: '2024-07-01' 
@@ -53,8 +54,8 @@ export default function EmailsPage() {
             id: 2, 
             title: 'June 2024 Newsletter', 
             subject: 'Community Impact Report', 
-            content: 'We are proud to share our impact from this past month...', 
-            htmlContent: '<h1>Community Impact Report</h1><p>We are proud to share our impact from this past month...</p>', 
+            content: 'We are proud to share our impact from this past month. With your support, we were able to provide meals to 300 families, offer educational support to 75 children, and connect 40 individuals with job training opportunities. Your generosity continues to transform lives in our community.', 
+            htmlContent: '<h1>Community Impact Report</h1><p>We are proud to share our impact from this past month. With your support, we were able to:</p><ul><li>Provide meals to 300 families</li><li>Offer educational support to 75 children</li><li>Connect 40 individuals with job training opportunities</li></ul><p>Your generosity continues to transform lives in our community.</p>', 
             status: 'Sent', 
             recipients: 156, 
             created: '2024-06-01' 
@@ -281,13 +282,18 @@ export default function EmailsPage() {
         }
     };
 
+    const truncateText = (text: string, maxLength: number) => {
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    };
+
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">Email & Newsletter Management</h2>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h2 className="text-2xl font-bold text-gray-900">Email & Newsletter Management</h2>
                 
                 {/* Tab Navigation */}
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                     <button
                         onClick={() => setActiveTab('newsletters')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -325,7 +331,7 @@ export default function EmailsPage() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                     <div className="flex items-center justify-between">
                         <div>
@@ -375,12 +381,12 @@ export default function EmailsPage() {
 
             {/* Content based on active tab */}
             {activeTab === 'newsletters' && (
-                <div className="bg-white p-6 rounded-lg border border-gray-200">
-                    <div className="flex justify-between items-center mb-6">
+                <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                         <h3 className="text-lg font-semibold">Newsletter Management</h3>
                         <button 
                             onClick={() => openModal('newsletter')}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700"
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
                         >
                             <Plus className="h-4 w-4" />
                             Create Newsletter
@@ -389,45 +395,73 @@ export default function EmailsPage() {
                     
                     <div className="space-y-4">
                         {newsletters.map(newsletter => (
-                            <div key={newsletter.id} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                                <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                        <h4 className="font-medium text-lg">{newsletter.title}</h4>
-                                        <p className="text-gray-600 mt-1">{newsletter.subject}</p>
-                                        <p className="text-sm text-gray-500 mt-2 line-clamp-2">{newsletter.content}</p>
-                                        <div className="flex gap-4 mt-3 text-sm text-gray-500">
-                                            <span>Created: {newsletter.created}</span>
-                                            <span>Recipients: {newsletter.recipients}</span>
+                            <div key={newsletter.id} className="border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+                                <div className="p-4">
+                                    <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-semibold text-lg text-gray-900 mb-2">{newsletter.title}</h4>
+                                            <p className="text-gray-600 mb-2 font-medium">{newsletter.subject}</p>
+                                            <p className="text-sm text-gray-500 mb-3 leading-relaxed">
+                                                {expandedNewsletter === newsletter.id 
+                                                    ? newsletter.content 
+                                                    : truncateText(newsletter.content, 150)
+                                                }
+                                            </p>
+                                            {newsletter.content.length > 150 && (
+                                                <button
+                                                    onClick={() => setExpandedNewsletter(expandedNewsletter === newsletter.id ? null : newsletter.id)}
+                                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1 mb-3"
+                                                >
+                                                    {expandedNewsletter === newsletter.id ? (
+                                                        <>Show Less <ChevronUp className="h-4 w-4" /></>
+                                                    ) : (
+                                                        <>Show More <ChevronDown className="h-4 w-4" /></>
+                                                    )}
+                                                </button>
+                                            )}
+                                            <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                                                <span className="flex items-center gap-1">
+                                                    <Calendar className="h-4 w-4" />
+                                                    Created: {newsletter.created}
+                                                </span>
+                                                <span className="flex items-center gap-1">
+                                                    <Users className="h-4 w-4" />
+                                                    Recipients: {newsletter.recipients}
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="flex items-center gap-3 ml-4">
-                                        <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(newsletter.status)}`}>
-                                            {newsletter.status}
-                                        </span>
-                                        <div className="flex gap-2">
-                                            <button 
-                                                onClick={() => openModal('newsletter', newsletter)}
-                                                className="text-blue-600 hover:text-blue-900"
-                                            >
-                                                <Edit2 className="h-4 w-4" />
-                                            </button>
-                                            <button 
-                                                onClick={() => deleteItem('newsletter', newsletter.id)}
-                                                className="text-red-600 hover:text-red-900"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
+                                        <div className="flex flex-col items-end gap-3">
+                                            <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(newsletter.status)}`}>
+                                                {newsletter.status}
+                                            </span>
+                                            <div className="flex gap-2">
+                                                <button 
+                                                    onClick={() => openModal('newsletter', newsletter)}
+                                                    className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                                                    title="Edit"
+                                                >
+                                                    <Edit2 className="h-4 w-4" />
+                                                </button>
+                                                <button 
+                                                    onClick={() => deleteItem('newsletter', newsletter.id)}
+                                                    className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 {newsletter.status === 'Draft' && (
-                                    <div className="mt-4 pt-4 border-t border-gray-200">
+                                    <div className="px-4 pb-4 pt-0 border-t border-gray-100">
                                         <button 
                                             onClick={() => sendNewsletter(newsletter.id)}
-                                            className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700"
+                                            disabled={sending}
+                                            className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             <Send className="h-4 w-4" />
-                                            Send Now
+                                            {sending ? 'Sending...' : 'Send Now'}
                                         </button>
                                     </div>
                                 )}
@@ -438,43 +472,49 @@ export default function EmailsPage() {
             )}
 
             {activeTab === 'templates' && (
-                <div className="bg-white p-6 rounded-lg border border-gray-200">
-                    <div className="flex justify-between items-center mb-6">
+                <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                         <h3 className="text-lg font-semibold">Email Templates</h3>
                         <button 
                             onClick={() => openModal('template')}
-                            className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700"
+                            className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700 transition-colors"
                         >
                             <Plus className="h-4 w-4" />
                             Create Template
                         </button>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         {emailTemplates.map(template => (
-                            <div key={template.id} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                                <div className="flex justify-between items-start mb-3">
-                                    <h4 className="font-medium">{template.name}</h4>
-                                    <div className="flex gap-1">
-                                        <button 
-                                            onClick={() => openModal('template', template)}
-                                            className="text-blue-600 hover:text-blue-900"
-                                        >
-                                            <Edit2 className="h-3 w-3" />
-                                        </button>
-                                        <button 
-                                            onClick={() => deleteItem('template', template.id)}
-                                            className="text-red-600 hover:text-red-900"
-                                        >
-                                            <Trash2 className="h-3 w-3" />
-                                        </button>
+                            <div key={template.id} className="border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+                                <div className="p-4">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h4 className="font-semibold text-gray-900">{template.name}</h4>
+                                        <div className="flex gap-1">
+                                            <button 
+                                                onClick={() => openModal('template', template)}
+                                                className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                                                title="Edit"
+                                            >
+                                                <Edit2 className="h-3 w-3" />
+                                            </button>
+                                            <button 
+                                                onClick={() => deleteItem('template', template.id)}
+                                                className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                                                title="Delete"
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </button>
+                                        </div>
                                     </div>
+                                    <p className="text-sm text-gray-600 mb-3 font-medium">{template.subject}</p>
+                                    <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+                                        {truncateText(template.content, 120)}
+                                    </p>
+                                    <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(template.type)}`}>
+                                        {template.type.replace('_', ' ').toUpperCase()}
+                                    </span>
                                 </div>
-                                <p className="text-sm text-gray-600 mb-2">{template.subject}</p>
-                                <p className="text-xs text-gray-500 mb-3 line-clamp-3">{template.content}</p>
-                                <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(template.type)}`}>
-                                    {template.type.replace('_', ' ').toUpperCase()}
-                                </span>
                             </div>
                         ))}
                     </div>
@@ -482,12 +522,12 @@ export default function EmailsPage() {
             )}
 
             {activeTab === 'automation' && (
-                <div className="bg-white p-6 rounded-lg border border-gray-200">
-                    <div className="flex justify-between items-center mb-6">
+                <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                         <h3 className="text-lg font-semibold">Email Automation Rules</h3>
                         <button 
                             onClick={() => openModal('automation')}
-                            className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700"
+                            className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 transition-colors"
                         >
                             <Plus className="h-4 w-4" />
                             Create Automation
@@ -496,39 +536,45 @@ export default function EmailsPage() {
                     
                     <div className="space-y-4">
                         {automatedEmails.map(automation => (
-                            <div key={automation.id} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                                <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                        <h4 className="font-medium">{automation.name}</h4>
-                                        <p className="text-sm text-gray-600 mt-1">
-                                            Trigger: {automation.trigger.replace('_', ' ').toLowerCase()}
-                                        </p>
-                                        <p className="text-sm text-gray-600">Template: {automation.template}</p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <button
-                                            onClick={() => toggleAutomation(automation.id)}
-                                            className={`px-3 py-1 text-sm font-medium rounded-full cursor-pointer ${
-                                                automation.active 
-                                                    ? 'bg-green-100 text-green-800' 
-                                                    : 'bg-gray-100 text-gray-800'
-                                            }`}
-                                        >
-                                            {automation.active ? 'Active' : 'Inactive'}
-                                        </button>
-                                        <div className="flex gap-2">
-                                            <button 
-                                                onClick={() => openModal('automation', automation)}
-                                                className="text-blue-600 hover:text-blue-900"
+                            <div key={automation.id} className="border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+                                <div className="p-4">
+                                    <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-semibold text-gray-900 mb-2">{automation.name}</h4>
+                                            <p className="text-sm text-gray-600 mb-1">
+                                                <span className="font-medium">Trigger:</span> {automation.trigger.replace('_', ' ').toLowerCase()}
+                                            </p>
+                                            <p className="text-sm text-gray-600">
+                                                <span className="font-medium">Template:</span> {automation.template}
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-col items-end gap-3">
+                                            <button
+                                                onClick={() => toggleAutomation(automation.id)}
+                                                className={`px-3 py-1 text-sm font-medium rounded-full cursor-pointer transition-colors ${
+                                                    automation.active 
+                                                        ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                                                }`}
                                             >
-                                                <Edit2 className="h-4 w-4" />
+                                                {automation.active ? 'Active' : 'Inactive'}
                                             </button>
-                                            <button 
-                                                onClick={() => deleteItem('automation', automation.id)}
-                                                className="text-red-600 hover:text-red-900"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
+                                            <div className="flex gap-2">
+                                                <button 
+                                                    onClick={() => openModal('automation', automation)}
+                                                    className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                                                    title="Edit"
+                                                >
+                                                    <Edit2 className="h-4 w-4" />
+                                                </button>
+                                                <button 
+                                                    onClick={() => deleteItem('automation', automation.id)}
+                                                    className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -542,34 +588,47 @@ export default function EmailsPage() {
             <Modal
                 isOpen={showModal}
                 onClose={closeModal}
+                size="xl"
                 title={
                     modalType === 'newsletter' ? (editingItem ? 'Edit Newsletter' : 'Create Newsletter') :
                     modalType === 'template' ? (editingItem ? 'Edit Template' : 'Create Template') :
                     (editingItem ? 'Edit Automation' : 'Create Automation')
                 }
             >
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     {modalType === 'newsletter' && (
-                        <>
-                            <input
-                                type="text"
-                                placeholder="Newsletter Title"
-                                value={formData.title || ''}
-                                onChange={(e) => setFormData({...formData, title: e.target.value})}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                required
-                            />
-                            <input
-                                type="text"
-                                placeholder="Email Subject"
-                                value={formData.subject || ''}
-                                onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                required
-                            />
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Newsletter Title
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter newsletter title"
+                                        value={formData.title || ''}
+                                        onChange={(e) => setFormData({...formData, title: e.target.value})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Email Subject
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter email subject"
+                                        value={formData.subject || ''}
+                                        onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+                            </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Newsletter Content (HTML)
+                                    Newsletter Content
                                 </label>
                                 <HTMLEditor
                                     content={formData.htmlContent || ''}
@@ -577,43 +636,60 @@ export default function EmailsPage() {
                                     placeholder="Write your newsletter content here..."
                                 />
                             </div>
-                        </>
+                        </div>
                     )}
 
                     {modalType === 'template' && (
-                        <>
-                            <input
-                                type="text"
-                                placeholder="Template Name"
-                                value={formData.name || ''}
-                                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                                required
-                            />
-                            <select
-                                value={formData.type || ''}
-                                onChange={(e) => setFormData({...formData, type: e.target.value})}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                                required
-                            >
-                                <option value="">Select Template Type</option>
-                                <option value="welcome">Welcome</option>
-                                <option value="donation_ack">Donation Acknowledgment</option>
-                                <option value="newsletter">Newsletter</option>
-                                <option value="event_reminder">Event Reminder</option>
-                                <option value="thank_you">Thank You</option>
-                            </select>
-                            <input
-                                type="text"
-                                placeholder="Email Subject"
-                                value={formData.subject || ''}
-                                onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                                required
-                            />
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Template Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter template name"
+                                        value={formData.name || ''}
+                                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Template Type
+                                    </label>
+                                    <select
+                                        value={formData.type || ''}
+                                        onChange={(e) => setFormData({...formData, type: e.target.value})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                                        required
+                                    >
+                                        <option value="">Select Template Type</option>
+                                        <option value="welcome">Welcome</option>
+                                        <option value="donation_ack">Donation Acknowledgment</option>
+                                        <option value="newsletter">Newsletter</option>
+                                        <option value="event_reminder">Event Reminder</option>
+                                        <option value="thank_you">Thank You</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Email Subject
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter email subject"
+                                        value={formData.subject || ''}
+                                        onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                                        required
+                                    />
+                                </div>
+                            </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Email Template Content (HTML)
+                                    Template Content
                                 </label>
                                 <HTMLEditor
                                     content={formData.htmlContent || ''}
@@ -621,62 +697,78 @@ export default function EmailsPage() {
                                     placeholder="Write your email template here... Use variables like [DONOR_NAME], [AMOUNT], etc."
                                 />
                             </div>
-                        </>
+                        </div>
                     )}
 
                     {modalType === 'automation' && (
-                        <>
-                            <input
-                                type="text"
-                                placeholder="Automation Name"
-                                value={formData.name || ''}
-                                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                required
-                            />
-                            <select
-                                value={formData.trigger || ''}
-                                onChange={(e) => setFormData({...formData, trigger: e.target.value})}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                required
-                            >
-                                <option value="">Select Trigger</option>
-                                <option value="new_donor">New Donor Registration</option>
-                                <option value="donation_received">Donation Received</option>
-                                <option value="volunteer_signup">Volunteer Signup</option>
-                                <option value="event_registration">Event Registration</option>
-                            </select>
-                            <select
-                                value={formData.template || ''}
-                                onChange={(e) => setFormData({...formData, template: e.target.value})}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                required
-                            >
-                                <option value="">Select Email Template</option>
-                                {emailTemplates.map(template => (
-                                    <option key={template.id} value={template.name}>
-                                        {template.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Automation Name
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Enter automation name"
+                                    value={formData.name || ''}
+                                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Trigger Event
+                                </label>
+                                <select
+                                    value={formData.trigger || ''}
+                                    onChange={(e) => setFormData({...formData, trigger: e.target.value})}
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    required
+                                >
+                                    <option value="">Select Trigger</option>
+                                    <option value="new_donor">New Donor Registration</option>
+                                    <option value="donation_received">Donation Received</option>
+                                    <option value="volunteer_signup">Volunteer Signup</option>
+                                    <option value="event_registration">Event Registration</option>
+                                </select>
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Email Template
+                                </label>
+                                <select
+                                    value={formData.template || ''}
+                                    onChange={(e) => setFormData({...formData, template: e.target.value})}
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    required
+                                >
+                                    <option value="">Select Email Template</option>
+                                    {emailTemplates.map(template => (
+                                        <option key={template.id} value={template.name}>
+                                            {template.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
                     )}
                     
-                    <div className="flex gap-3 pt-4">
+                    <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
                         <button
                             type="submit"
-                            className={`flex-1 py-2 px-4 rounded-lg text-white font-medium ${
+                            disabled={sending}
+                            className={`flex-1 py-3 px-6 rounded-lg text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                                 modalType === 'newsletter' ? 'bg-blue-600 hover:bg-blue-700' :
                                 modalType === 'template' ? 'bg-purple-600 hover:bg-purple-700' :
                                 'bg-green-600 hover:bg-green-700'
                             }`}
                         >
-                            {editingItem ? 'Update' : 'Create'}
+                            {sending ? 'Processing...' : (editingItem ? 'Update' : 'Create')}
                         </button>
                         <button
                             type="button"
                             onClick={closeModal}
-                            className="flex-1 py-2 px-4 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                            className="flex-1 py-3 px-6 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
                         >
                             Cancel
                         </button>
