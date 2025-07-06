@@ -1,5 +1,3 @@
-// app/volunteers/page.tsx
-
 'use client';
 
 import { useState } from 'react';
