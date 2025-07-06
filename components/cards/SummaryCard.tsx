@@ -1,5 +1,3 @@
-// components/cards/SummaryCard.tsx
-
 type SummaryCardProps = {
     title: string;
     value: number;

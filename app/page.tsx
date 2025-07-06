@@ -1,8 +1,6 @@
-// app/page.tsx
-
 'use client';
 
-import SummaryCard from '../../components/cards/SummaryCard';
+import SummaryCard from '../components/cards/SummaryCard';
 
 export default function DashboardPage() {
     return (
