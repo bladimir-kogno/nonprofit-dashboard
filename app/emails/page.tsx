@@ -229,15 +229,28 @@ export default function EmailsPage() {
         const newsletter = newsletters.find(n => n.id === newsletterId);
         if (!newsletter) return;
 
-        // Mock recipient emails - in production, get from database
-        const recipients = [
+        // Get all subscribers from different sources
+        const donorEmails = [
             'donor1@example.com',
-            'donor2@example.com',
-            'volunteer1@example.com'
+            'donor2@example.com'
+        ];
+        
+        const volunteerEmails = [
+            'volunteer1@example.com',
+            'volunteer2@example.com'
+        ];
+        
+        // Mock friends newsletter subscribers - in production, get from friends database
+        const friendEmails = [
+            'sarah@email.com',
+            'mike@email.com',
+            'lisa@localnews.com'
         ];
 
+        const allRecipients = [...donorEmails, ...volunteerEmails, ...friendEmails];
+
         const emailData = {
-            to: recipients,
+            to: allRecipients,
             subject: newsletter.subject,
             htmlContent: newsletter.htmlContent,
             type: 'newsletter'
@@ -246,7 +259,7 @@ export default function EmailsPage() {
         const success = await sendEmail(emailData);
         
         if (success) {
-            const totalRecipients = recipients.length;
+            const totalRecipients = allRecipients.length;
             setNewsletters(newsletters.map(n => 
                 n.id === newsletterId 
                     ? { ...n, status: 'Sent' as const, recipients: totalRecipients }
