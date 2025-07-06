@@ -1,8 +1,9 @@
-// app/layout.tsx
+/// app/layout.tsx
 
 import '../styles/globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import TopNav from '../components/layout/TopNav';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,9 +20,13 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body className={inter.className}>
-        {children}
+        <TopNav />
+        <div className="max-w-screen-xl mx-auto px-4 py-6">
+            {children}
+        </div>
         </body>
         </html>
     );
 }
+
 
