@@ -81,14 +81,47 @@ export default function DonorsPage() {
             };
             setDonors([...donors, newDonor]);
             
-            // Simulate automated welcome email
-            alert(`🎉 Welcome email sent to ${newDonor.name}!\n\nTemplate: "Welcome to Our Nonprofit Family"\nSubject: "Welcome to Our Nonprofit Family!"\n\nAutomated email system is active.`);
+            // Send automated welcome email
+            sendWelcomeEmail(newDonor);
         }
         
         closeModal();
     };
 
-    const recordDonation = (donorId: number, amount: number) => {
+    const sendWelcomeEmail = async (donor: Donor) => {
+        try {
+            const emailData = {
+                to: donor.email,
+                subject: 'Welcome to Our Nonprofit Family!',
+                htmlContent: `<h2>Welcome to Our Nonprofit Family!</h2><p>Dear <strong>${donor.name}</strong>,</p><p>Welcome to our community! We are thrilled to have you join our mission to create positive change. Your support helps us reach more people and make a greater impact.</p><ul><li>Stay updated with our monthly newsletter</li><li>Join our volunteer opportunities</li><li>Attend our community events</li></ul><p>Thank you for being part of our journey!</p><p>Best regards,<br>The Nonprofit Team</p>`,
+                variables: {
+                    DONOR_NAME: donor.name
+                },
+                type: 'welcome'
+            };
+
+            const response = await fetch('/api/send-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(emailData),
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                alert(`🎉 ${donor.name} added successfully!\n\n📧 Welcome email sent to ${donor.email}.\n\n${result.preview ? `Preview: ${result.preview}` : ''}`);
+            } else {
+                alert(`🎉 ${donor.name} added successfully!\n\n❌ However, welcome email sending failed: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Error sending welcome email:', error);
+            alert(`🎉 ${donor.name} added successfully!\n\n❌ However, welcome email sending failed due to network error.`);
+        }
+    };
+
+    const recordDonation = async (donorId: number, amount: number) => {
         const donor = donors.find(d => d.id === donorId);
         if (donor) {
             const newTotalGiven = donor.totalGiven + amount;
@@ -100,8 +133,38 @@ export default function DonorsPage() {
                     : d
             ));
             
-            // Simulate automated donation acknowledgment email
-            alert(`📧 Donation acknowledgment email sent to ${donor.name}!\n\nTemplate: "Thank you for your generous donation!"\nAmount: $${amount.toLocaleString()}\n\nAutomated email system is active.`);
+            // Send automated donation acknowledgment email
+            try {
+                const emailData = {
+                    to: donor.email,
+                    subject: 'Thank you for your generous donation!',
+                    htmlContent: `<h2>Thank You for Your Generous Donation!</h2><p>Dear <strong>${donor.name}</strong>,</p><p>Thank you so much for your generous donation of <strong>$${amount.toLocaleString()}</strong>. Your support means the world to us and helps us continue our mission to make a positive impact in our community.</p><p>Your total contributions now amount to <strong>$${newTotalGiven.toLocaleString()}</strong>.</p><p>With gratitude,<br>The Nonprofit Team</p>`,
+                    variables: {
+                        DONOR_NAME: donor.name,
+                        AMOUNT: amount.toString()
+                    },
+                    type: 'donation_acknowledgment'
+                };
+
+                const response = await fetch('/api/send-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(emailData),
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`✅ Donation of $${amount.toLocaleString()} recorded successfully!\n\n📧 Automated thank you email sent to ${donor.name} (${donor.email}).\n\n${result.preview ? `Preview: ${result.preview}` : ''}`);
+                } else {
+                    alert(`✅ Donation of $${amount.toLocaleString()} recorded successfully!\n\n❌ However, email sending failed: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error sending email:', error);
+                alert(`✅ Donation of $${amount.toLocaleString()} recorded successfully!\n\n❌ However, email sending failed due to network error.`);
+            }
         }
     };
 
