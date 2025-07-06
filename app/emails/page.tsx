@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Send, Mail, MessageCircle, Settings, Users, Calendar } from 'lucide-react';
+import { Plus, Edit2, Trash2, Send, Mail, MessageCircle, Settings, Users, Calendar, Eye } from 'lucide-react';
 import Modal from '../../components/shared/Modal';
 import HTMLEditor from '../../components/shared/HTMLEditor';
 
@@ -113,9 +113,15 @@ export default function EmailsPage() {
     ]);
 
     const [showModal, setShowModal] = useState(false);
+    const [showSampleModal, setShowSampleModal] = useState(false);
     const [modalType, setModalType] = useState<'newsletter' | 'template' | 'automation'>('newsletter');
     const [editingItem, setEditingItem] = useState<any>(null);
     const [formData, setFormData] = useState<any>({});
+    const [sampleEmailData, setSampleEmailData] = useState({
+        testEmail: '',
+        subject: '',
+        htmlContent: ''
+    });
     const [sending, setSending] = useState(false);
 
     // Email sending function
@@ -163,6 +169,53 @@ export default function EmailsPage() {
             }
         }
         setShowModal(true);
+    };
+
+    const openSampleModal = () => {
+        setSampleEmailData({
+            testEmail: '',
+            subject: 'Sample Email Test',
+            htmlContent: '<h2>This is a sample email</h2><p>This email is being sent to test how it will look for recipients.</p><p>You can customize this content to test your email templates and formatting.</p>'
+        });
+        setShowSampleModal(true);
+    };
+
+    const sendSampleEmail = async () => {
+        if (!sampleEmailData.testEmail) {
+            alert('Please enter a test email address.');
+            return;
+        }
+
+        setSending(true);
+        
+        try {
+            const response = await fetch('/api/send-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    to: sampleEmailData.testEmail,
+                    subject: `[TEST] ${sampleEmailData.subject}`,
+                    htmlContent: sampleEmailData.htmlContent,
+                    type: 'sample_test'
+                }),
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                alert(`✅ Sample email sent successfully to ${sampleEmailData.testEmail}!\n\n${result.preview ? `Preview: ${result.preview}` : ''}`);
+                setShowSampleModal(false);
+            } else {
+                alert(`❌ Failed to send sample email: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Error sending sample email:', error);
+            alert('❌ Failed to send sample email due to network error.');
+        } finally {
+            setSending(false);
+        }
     };
 
     const closeModal = () => {
@@ -296,12 +349,21 @@ export default function EmailsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h2 className="text-xl font-semibold">Email & Newsletter Management</h2>
                 
-                {/* Tab Navigation */}
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                     <button
+                        onClick={openSampleModal}
+                        className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700 text-sm"
+                    >
+                        <Eye className="h-4 w-4" />
+                        Send Sample Email
+                    </button>
+                    
+                    {/* Tab Navigation */}
+                    <div className="flex gap-2">
+                        <button
                         onClick={() => setActiveTab('newsletters')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                             activeTab === 'newsletters' 
@@ -323,17 +385,18 @@ export default function EmailsPage() {
                         <MessageCircle className="h-4 w-4 inline mr-2" />
                         Templates
                     </button>
-                    <button
-                        onClick={() => setActiveTab('automation')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            activeTab === 'automation' 
-                                ? 'bg-blue-600 text-white' 
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                    >
-                        <Settings className="h-4 w-4 inline mr-2" />
-                        Automation
-                    </button>
+                        <button
+                            onClick={() => setActiveTab('automation')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                activeTab === 'automation' 
+                                    ? 'bg-blue-600 text-white' 
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                        >
+                            <Settings className="h-4 w-4 inline mr-2" />
+                            Automation
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -695,6 +758,59 @@ export default function EmailsPage() {
                         </button>
                     </div>
                 </form>
+            </Modal>
+
+            {/* Send Sample Email Modal */}
+            <Modal
+                isOpen={showSampleModal}
+                onClose={() => setShowSampleModal(false)}
+                title="Send Sample Email"
+            >
+                <div className="space-y-4">
+                    <input
+                        type="email"
+                        placeholder="Test Email Address"
+                        value={sampleEmailData.testEmail}
+                        onChange={(e) => setSampleEmailData({...sampleEmailData, testEmail: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                        required
+                    />
+
+                    <input
+                        type="text"
+                        placeholder="Email Subject"
+                        value={sampleEmailData.subject}
+                        onChange={(e) => setSampleEmailData({...sampleEmailData, subject: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                        required
+                    />
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Sample Email Content</label>
+                        <HTMLEditor
+                            content={sampleEmailData.htmlContent}
+                            onChange={(html) => setSampleEmailData({...sampleEmailData, htmlContent: html})}
+                            placeholder="Create your sample email content here..."
+                        />
+                    </div>
+                    
+                    <div className="flex gap-3 pt-4">
+                        <button
+                            onClick={sendSampleEmail}
+                            disabled={sending || !sampleEmailData.testEmail}
+                            className="flex-1 py-2 px-4 rounded-lg text-white font-medium bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {sending ? 'Sending...' : 'Send Sample Email'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowSampleModal(false)}
+                            className="flex-1 py-2 px-4 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
             </Modal>
         </div>
     );

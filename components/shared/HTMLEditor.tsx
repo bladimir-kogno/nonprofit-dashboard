@@ -19,7 +19,7 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
         },
         editorProps: {
             attributes: {
-                class: 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] p-4',
+                class: 'prose prose-sm max-w-none focus:outline-none min-h-[200px] p-4',
             },
         },
     });
