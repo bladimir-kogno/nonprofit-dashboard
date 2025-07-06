@@ -1,15 +1,10 @@
-// components/reports/EventAttendanceReport.tsx
-
-'use client';
-
 import { useEffect, useState } from 'react';
-import { EventAttendanceReport } from '@/types/report';
+import type { EventAttendanceReport as EventAttendanceRow } from '@types/report';
 
 export default function EventAttendanceReport() {
-    const [data, setData] = useState<EventAttendanceReport[]>([]);
+    const [data, setData] = useState<EventAttendanceRow[]>([]);
 
     useEffect(() => {
-        // Placeholder data — replace with real aggregation logic or API call
         setData([
             { eventId: 'e1', eventTitle: 'Community Clean-Up', totalAttendees: 12 },
             { eventId: 'e2', eventTitle: 'Fundraising Gala', totalAttendees: 8 },
