@@ -19,23 +19,26 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
         },
         editorProps: {
             attributes: {
-                class: 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] p-4',
+                class: 'prose prose-sm sm:prose-base max-w-none focus:outline-none min-h-[200px] p-4 overflow-auto',
             },
         },
     });
 
     if (!editor) {
-        return null;
+        return <div className="border border-gray-300 rounded-lg p-4 bg-gray-50 animate-pulse min-h-[250px]">
+            <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>;
     }
 
     return (
-        <div className="border border-gray-300 rounded-lg overflow-hidden">
+        <div className="border border-gray-300 rounded-lg overflow-hidden shadow-sm">
             {/* Toolbar */}
-            <div className="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap gap-1">
+            <div className="bg-gray-50 border-b border-gray-300 p-3 flex flex-wrap gap-1 overflow-x-auto">
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleBold().run()}
-                    className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('bold') ? 'bg-gray-300' : ''}`}
+                    className={`p-2 rounded hover:bg-gray-200 transition-colors ${editor.isActive('bold') ? 'bg-gray-300' : ''}`}
                     title="Bold"
                 >
                     <Bold className="h-4 w-4" />
@@ -44,7 +47,7 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleItalic().run()}
-                    className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('italic') ? 'bg-gray-300' : ''}`}
+                    className={`p-2 rounded hover:bg-gray-200 transition-colors ${editor.isActive('italic') ? 'bg-gray-300' : ''}`}
                     title="Italic"
                 >
                     <Italic className="h-4 w-4" />
@@ -55,7 +58,7 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleBulletList().run()}
-                    className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('bulletList') ? 'bg-gray-300' : ''}`}
+                    className={`p-2 rounded hover:bg-gray-200 transition-colors ${editor.isActive('bulletList') ? 'bg-gray-300' : ''}`}
                     title="Bullet List"
                 >
                     <List className="h-4 w-4" />
@@ -64,7 +67,7 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                    className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('orderedList') ? 'bg-gray-300' : ''}`}
+                    className={`p-2 rounded hover:bg-gray-200 transition-colors ${editor.isActive('orderedList') ? 'bg-gray-300' : ''}`}
                     title="Numbered List"
                 >
                     <ListOrdered className="h-4 w-4" />
@@ -73,7 +76,7 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                    className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('blockquote') ? 'bg-gray-300' : ''}`}
+                    className={`p-2 rounded hover:bg-gray-200 transition-colors ${editor.isActive('blockquote') ? 'bg-gray-300' : ''}`}
                     title="Quote"
                 >
                     <Quote className="h-4 w-4" />
@@ -84,7 +87,7 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().setHeading({ level: 1 }).run()}
-                    className={`px-3 py-2 rounded hover:bg-gray-200 text-sm font-medium ${editor.isActive('heading', { level: 1 }) ? 'bg-gray-300' : ''}`}
+                    className={`px-3 py-2 rounded hover:bg-gray-200 transition-colors text-sm font-medium ${editor.isActive('heading', { level: 1 }) ? 'bg-gray-300' : ''}`}
                     title="Heading 1"
                 >
                     H1
@@ -93,7 +96,7 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().setHeading({ level: 2 }).run()}
-                    className={`px-3 py-2 rounded hover:bg-gray-200 text-sm font-medium ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-300' : ''}`}
+                    className={`px-3 py-2 rounded hover:bg-gray-200 transition-colors text-sm font-medium ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-300' : ''}`}
                     title="Heading 2"
                 >
                     H2
@@ -102,7 +105,7 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().setParagraph().run()}
-                    className={`px-3 py-2 rounded hover:bg-gray-200 text-sm ${editor.isActive('paragraph') ? 'bg-gray-300' : ''}`}
+                    className={`px-3 py-2 rounded hover:bg-gray-200 transition-colors text-sm ${editor.isActive('paragraph') ? 'bg-gray-300' : ''}`}
                     title="Paragraph"
                 >
                     P
@@ -114,7 +117,7 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
                     type="button"
                     onClick={() => editor.chain().focus().undo().run()}
                     disabled={!editor.can().undo()}
-                    className="p-2 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Undo"
                 >
                     <Undo className="h-4 w-4" />
@@ -124,7 +127,7 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
                     type="button"
                     onClick={() => editor.chain().focus().redo().run()}
                     disabled={!editor.can().redo()}
-                    className="p-2 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Redo"
                 >
                     <Redo className="h-4 w-4" />
@@ -132,7 +135,7 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
             </div>
 
             {/* Editor */}
-            <div className="min-h-[200px] max-h-[400px] overflow-y-auto">
+            <div className="min-h-[200px] max-h-[400px] overflow-y-auto bg-white">
                 <EditorContent editor={editor} />
             </div>
 
@@ -140,12 +143,30 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
             <div className="bg-blue-50 border-t border-blue-200 p-3">
                 <p className="text-sm text-blue-800 font-medium mb-2">Available Variables:</p>
                 <div className="flex flex-wrap gap-2 text-xs">
-                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">[DONOR_NAME]</span>
-                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">[AMOUNT]</span>
-                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">[EVENT_NAME]</span>
-                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">[DATE]</span>
-                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">[TIME]</span>
-                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">[LOCATION]</span>
+                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded cursor-pointer hover:bg-blue-200"
+                          onClick={() => editor.chain().focus().insertContent('[DONOR_NAME]').run()}>
+                        [DONOR_NAME]
+                    </span>
+                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded cursor-pointer hover:bg-blue-200"
+                          onClick={() => editor.chain().focus().insertContent('[AMOUNT]').run()}>
+                        [AMOUNT]
+                    </span>
+                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded cursor-pointer hover:bg-blue-200"
+                          onClick={() => editor.chain().focus().insertContent('[EVENT_NAME]').run()}>
+                        [EVENT_NAME]
+                    </span>
+                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded cursor-pointer hover:bg-blue-200"
+                          onClick={() => editor.chain().focus().insertContent('[DATE]').run()}>
+                        [DATE]
+                    </span>
+                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded cursor-pointer hover:bg-blue-200"
+                          onClick={() => editor.chain().focus().insertContent('[TIME]').run()}>
+                        [TIME]
+                    </span>
+                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded cursor-pointer hover:bg-blue-200"
+                          onClick={() => editor.chain().focus().insertContent('[LOCATION]').run()}>
+                        [LOCATION]
+                    </span>
                 </div>
             </div>
         </div>
