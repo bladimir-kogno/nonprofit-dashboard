@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { EventAttendanceReport as EventAttendanceRow } from '@types/report';
+import type { EventAttendanceReport as EventAttendanceRow } from '@schemas/report';
 
 export default function EventAttendanceReport() {
     const [data, setData] = useState<EventAttendanceRow[]>([]);

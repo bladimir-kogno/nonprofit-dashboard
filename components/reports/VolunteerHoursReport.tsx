@@ -3,13 +3,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { VolunteerHoursReport } from '@/types/report';
+import type { VolunteerHoursReport as VolunteerHoursRow } from '@/types/report';
 
 export default function VolunteerHoursReport() {
-    const [data, setData] = useState<VolunteerHoursReport[]>([]);
+    const [data, setData] = useState<VolunteerHoursRow[]>([]);
 
     useEffect(() => {
-        // Placeholder data — replace with real aggregation logic or API call
         setData([
             { volunteerId: 'v1', volunteerName: 'Maria Gonzalez', totalHours: 42 },
             { volunteerId: 'v2', volunteerName: 'James Kim', totalHours: 18 },
