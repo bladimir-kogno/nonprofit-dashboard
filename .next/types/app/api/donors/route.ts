@@ -1,4 +1,4 @@
-// File: /Users/bladimirgarcia/WebstormProjects/my-nonprofit-app/app/api/donors/route.ts
+// File: /workspace/app/api/donors/route.ts
 import * as entry from '../../../../../app/api/donors/route.js'
 import type { NextRequest } from 'next/server.js'
 
