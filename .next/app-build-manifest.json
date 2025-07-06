@@ -32,19 +32,19 @@
       "static/chunks/119-6633353d8a0002e9.js",
       "static/chunks/app/events/page-ed87dd15e4a160ec.js"
     ],
-    "/reports/page": [
-      "static/chunks/webpack-aeef1a19aa36279c.js",
-      "static/chunks/fd9d1056-9f91b5e418130764.js",
-      "static/chunks/117-f02e4e9dc853ae1d.js",
-      "static/chunks/main-app-1c9daae6dc3fef31.js",
-      "static/chunks/app/reports/page-a9a6c34bd0a51b32.js"
-    ],
     "/page": [
       "static/chunks/webpack-aeef1a19aa36279c.js",
       "static/chunks/fd9d1056-9f91b5e418130764.js",
       "static/chunks/117-f02e4e9dc853ae1d.js",
       "static/chunks/main-app-1c9daae6dc3fef31.js",
       "static/chunks/app/page-c12cbb3ca2a463de.js"
+    ],
+    "/reports/page": [
+      "static/chunks/webpack-aeef1a19aa36279c.js",
+      "static/chunks/fd9d1056-9f91b5e418130764.js",
+      "static/chunks/117-f02e4e9dc853ae1d.js",
+      "static/chunks/main-app-1c9daae6dc3fef31.js",
+      "static/chunks/app/reports/page-a9a6c34bd0a51b32.js"
     ],
     "/volunteers/page": [
       "static/chunks/webpack-aeef1a19aa36279c.js",
