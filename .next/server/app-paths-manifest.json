@@ -1,3 +1,11 @@
 {
-  "/page": "app/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/events/route": "app/api/events/route.js",
+  "/api/donors/route": "app/api/donors/route.js",
+  "/donors/page": "app/donors/page.js",
+  "/api/volunteers/route": "app/api/volunteers/route.js",
+  "/page": "app/page.js",
+  "/events/page": "app/events/page.js",
+  "/volunteers/page": "app/volunteers/page.js",
+  "/reports/page": "app/reports/page.js"
 }
