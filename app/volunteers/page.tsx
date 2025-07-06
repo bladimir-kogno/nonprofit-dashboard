@@ -3,8 +3,8 @@
 'use client';
 
 import { useState } from 'react';
-import VolunteerTable from '@/components/tables/VolunteerTable';
-import VolunteerForm from '@/components/forms/VolunteerForm';
+import VolunteerForm from '@components/forms/VolunteerForm';
+import VolunteerTable from '@components/tables/VolunteerTable';
 
 export default function VolunteersPage() {
     const [showForm, setShowForm] = useState(false);
