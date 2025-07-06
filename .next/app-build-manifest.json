@@ -15,21 +15,6 @@
       "static/css/3a71cf588281223b.css",
       "static/chunks/app/layout-d3b0e485e950d50f.js"
     ],
-    "/page": [
-      "static/chunks/webpack-59fc70b561296e70.js",
-      "static/chunks/fd9d1056-9f91b5e418130764.js",
-      "static/chunks/117-90e22fc57e593a01.js",
-      "static/chunks/main-app-8ed0f9f19fa44374.js",
-      "static/chunks/app/page-87ba9197632b0419.js"
-    ],
-    "/donors/page": [
-      "static/chunks/webpack-59fc70b561296e70.js",
-      "static/chunks/fd9d1056-9f91b5e418130764.js",
-      "static/chunks/117-90e22fc57e593a01.js",
-      "static/chunks/main-app-8ed0f9f19fa44374.js",
-      "static/chunks/119-6633353d8a0002e9.js",
-      "static/chunks/app/donors/page-e81b716eec2d1135.js"
-    ],
     "/events/page": [
       "static/chunks/webpack-59fc70b561296e70.js",
       "static/chunks/fd9d1056-9f91b5e418130764.js",
@@ -38,13 +23,20 @@
       "static/chunks/119-6633353d8a0002e9.js",
       "static/chunks/app/events/page-d69c59ae065f8a9b.js"
     ],
+    "/page": [
+      "static/chunks/webpack-59fc70b561296e70.js",
+      "static/chunks/fd9d1056-9f91b5e418130764.js",
+      "static/chunks/117-90e22fc57e593a01.js",
+      "static/chunks/main-app-8ed0f9f19fa44374.js",
+      "static/chunks/app/page-87ba9197632b0419.js"
+    ],
     "/volunteers/page": [
       "static/chunks/webpack-59fc70b561296e70.js",
       "static/chunks/fd9d1056-9f91b5e418130764.js",
       "static/chunks/117-90e22fc57e593a01.js",
       "static/chunks/main-app-8ed0f9f19fa44374.js",
       "static/chunks/119-6633353d8a0002e9.js",
-      "static/chunks/app/volunteers/page-765696aa9e9bc75a.js"
+      "static/chunks/app/volunteers/page-a47d2c2962c8bc66.js"
     ],
     "/reports/page": [
       "static/chunks/webpack-59fc70b561296e70.js",
@@ -52,6 +44,14 @@
       "static/chunks/117-90e22fc57e593a01.js",
       "static/chunks/main-app-8ed0f9f19fa44374.js",
       "static/chunks/app/reports/page-397c0985400506ee.js"
+    ],
+    "/donors/page": [
+      "static/chunks/webpack-59fc70b561296e70.js",
+      "static/chunks/fd9d1056-9f91b5e418130764.js",
+      "static/chunks/117-90e22fc57e593a01.js",
+      "static/chunks/main-app-8ed0f9f19fa44374.js",
+      "static/chunks/119-6633353d8a0002e9.js",
+      "static/chunks/app/donors/page-e81b716eec2d1135.js"
     ]
   }
 }
