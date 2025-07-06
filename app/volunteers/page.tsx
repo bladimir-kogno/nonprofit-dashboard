@@ -3,7 +3,7 @@
 'use client';
 
 import { useState } from 'react';
-import VolunteerForm from '@components/forms/VolunteerForm';
+import VolunteerForm from '../../components/forms/VolunteerForm';
 import VolunteerTable from '@components/tables/VolunteerTable';
 
 export default function VolunteersPage() {
