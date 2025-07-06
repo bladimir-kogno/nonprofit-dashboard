@@ -80,9 +80,29 @@ export default function DonorsPage() {
                 lastDonation: 'Never'
             };
             setDonors([...donors, newDonor]);
+            
+            // Simulate automated welcome email
+            alert(`🎉 Welcome email sent to ${newDonor.name}!\n\nTemplate: "Welcome to Our Nonprofit Family"\nSubject: "Welcome to Our Nonprofit Family!"\n\nAutomated email system is active.`);
         }
         
         closeModal();
+    };
+
+    const recordDonation = (donorId: number, amount: number) => {
+        const donor = donors.find(d => d.id === donorId);
+        if (donor) {
+            const newTotalGiven = donor.totalGiven + amount;
+            const today = new Date().toISOString().split('T')[0];
+            
+            setDonors(donors.map(d => 
+                d.id === donorId 
+                    ? { ...d, totalGiven: newTotalGiven, lastDonation: today }
+                    : d
+            ));
+            
+            // Simulate automated donation acknowledgment email
+            alert(`📧 Donation acknowledgment email sent to ${donor.name}!\n\nTemplate: "Thank you for your generous donation!"\nAmount: $${amount.toLocaleString()}\n\nAutomated email system is active.`);
+        }
     };
 
     const deleteDonor = (id: number) => {
@@ -163,6 +183,16 @@ export default function DonorsPage() {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex gap-2">
+                                        <button 
+                                            onClick={() => {
+                                                const amount = parseFloat(prompt('Enter donation amount:') || '0');
+                                                if (amount > 0) recordDonation(donor.id, amount);
+                                            }}
+                                            className="text-green-600 hover:text-green-900"
+                                            title="Record Donation"
+                                        >
+                                            <Heart className="h-4 w-4" />
+                                        </button>
                                         <button 
                                             onClick={() => openModal(donor)}
                                             className="text-blue-600 hover:text-blue-900"

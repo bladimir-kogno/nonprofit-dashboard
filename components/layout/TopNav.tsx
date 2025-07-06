@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart3, Heart, Users, Calendar, FileText } from 'lucide-react';
+import { BarChart3, Heart, Users, Calendar, FileText, Mail } from 'lucide-react';
 
 const navItems = [
     { label: 'Dashboard', href: '/', icon: BarChart3 },
     { label: 'Donors', href: '/donors', icon: Heart },
     { label: 'Volunteers', href: '/volunteers', icon: Users },
     { label: 'Events', href: '/events', icon: Calendar },
+    { label: 'Email & Newsletter', href: '/emails', icon: Mail },
     { label: 'Reports', href: '/reports', icon: FileText },
 ];
 
