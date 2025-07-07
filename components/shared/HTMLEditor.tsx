@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, List, ListOrdered, Link, Quote, Undo, Redo } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Link, Quote, Undo, Redo, Code, Eye } from 'lucide-react';
 
 interface HTMLEditorProps {
     content: string;
@@ -11,11 +12,16 @@ interface HTMLEditorProps {
 }
 
 export default function HTMLEditor({ content, onChange, placeholder = "Start writing..." }: HTMLEditorProps) {
+    const [isHtmlMode, setIsHtmlMode] = useState(false);
+    const [htmlContent, setHtmlContent] = useState(content);
+
     const editor = useEditor({
         extensions: [StarterKit],
         content: content,
         onUpdate: ({ editor }) => {
-            onChange(editor.getHTML());
+            const html = editor.getHTML();
+            setHtmlContent(html);
+            onChange(html);
         },
         editorProps: {
             attributes: {
@@ -23,6 +29,29 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
             },
         },
     });
+
+    const handleHtmlChange = (newHtml: string) => {
+        setHtmlContent(newHtml);
+        onChange(newHtml);
+        if (editor) {
+            editor.commands.setContent(newHtml);
+        }
+    };
+
+    const toggleMode = () => {
+        if (isHtmlMode) {
+            // Switching from HTML to visual mode
+            if (editor) {
+                editor.commands.setContent(htmlContent);
+            }
+        } else {
+            // Switching from visual to HTML mode
+            if (editor) {
+                setHtmlContent(editor.getHTML());
+            }
+        }
+        setIsHtmlMode(!isHtmlMode);
+    };
 
     if (!editor) {
         return <div className="border border-gray-300 rounded-lg p-4 bg-gray-50 animate-pulse min-h-[250px]">
@@ -35,6 +64,20 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
         <div className="border border-gray-300 rounded-lg overflow-hidden shadow-sm">
             {/* Toolbar */}
             <div className="bg-gray-50 border-b border-gray-300 p-3 flex flex-wrap gap-1 overflow-x-auto">
+                {/* Mode Toggle */}
+                <button
+                    type="button"
+                    onClick={toggleMode}
+                    className={`px-3 py-2 rounded hover:bg-gray-200 transition-colors text-sm font-medium mr-2 ${isHtmlMode ? 'bg-gray-300' : ''}`}
+                    title={isHtmlMode ? "Switch to Visual Editor" : "Switch to HTML Code"}
+                >
+                    {isHtmlMode ? <Eye className="h-4 w-4" /> : <Code className="h-4 w-4" />}
+                </button>
+
+                <div className="w-px h-8 bg-gray-300 mx-1"></div>
+
+                {!isHtmlMode && (
+                    <>
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleBold().run()}
@@ -132,11 +175,23 @@ export default function HTMLEditor({ content, onChange, placeholder = "Start wri
                 >
                     <Redo className="h-4 w-4" />
                 </button>
+                    </>
+                )}
             </div>
 
             {/* Editor */}
             <div className="min-h-[200px] max-h-[400px] overflow-y-auto bg-white">
-                <EditorContent editor={editor} />
+                {isHtmlMode ? (
+                    <textarea
+                        value={htmlContent}
+                        onChange={(e) => handleHtmlChange(e.target.value)}
+                        placeholder="Enter HTML code here..."
+                        className="w-full h-full min-h-[200px] p-4 border-0 focus:outline-none font-mono text-sm resize-none"
+                        style={{ fontFamily: 'monospace' }}
+                    />
+                ) : (
+                    <EditorContent editor={editor} />
+                )}
             </div>
 
             {/* Variables Helper */}

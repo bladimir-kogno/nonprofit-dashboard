@@ -186,9 +186,9 @@ export default function ContactsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h1 className="text-2xl font-bold text-gray-900">Contact Management</h1>
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                     <button
                         onClick={() => setShowAddContactModal(true)}
                         className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -249,8 +249,8 @@ export default function ContactsPage() {
             </div>
 
             {/* Search and Stats */}
-            <div className="flex justify-between items-center">
-                <div className="relative flex-1 max-w-md">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="relative w-full sm:flex-1 sm:max-w-md">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <input
                         type="text"
@@ -260,7 +260,7 @@ export default function ContactsPage() {
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-600 w-full sm:w-auto text-left sm:text-right">
                     Showing {filteredContacts.length} of {contacts.length} contacts
                 </div>
             </div>
