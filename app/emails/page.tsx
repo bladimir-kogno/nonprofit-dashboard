@@ -135,6 +135,9 @@ export default function EmailsPage() {
     const [sending, setSending] = useState(false);
     const [showSampleEmailModal, setShowSampleEmailModal] = useState(false);
     const [sampleEmailData, setSampleEmailData] = useState({ email: '', templateId: 0 });
+    const [showSendModal, setShowSendModal] = useState(false);
+    const [sendingNewsletter, setSendingNewsletter] = useState<Newsletter | null>(null);
+    const [sendLaterData, setSendLaterData] = useState({ date: '', time: '' });
 
     // Email sending function
     const sendEmail = async (emailData: any) => {
@@ -277,6 +280,44 @@ export default function EmailsPage() {
         setAutomatedEmails(automatedEmails.map(a => 
             a.id === id ? { ...a, active: !a.active } : a
         ));
+    };
+
+    const openSendModal = (newsletter: Newsletter) => {
+        setSendingNewsletter(newsletter);
+        setShowSendModal(true);
+        setSendLaterData({ date: '', time: '' });
+    };
+
+    const handleSendNow = async () => {
+        if (!sendingNewsletter) return;
+        
+        await sendNewsletter(sendingNewsletter.id);
+        setShowSendModal(false);
+        setSendingNewsletter(null);
+    };
+
+    const handleSendLater = async () => {
+        if (!sendingNewsletter || !sendLaterData.date || !sendLaterData.time) {
+            alert('Please select both date and time for scheduled sending');
+            return;
+        }
+
+        // Update newsletter with scheduled info
+        setNewsletters(newsletters.map(n => 
+            n.id === sendingNewsletter.id 
+                ? { 
+                    ...n, 
+                    status: 'Scheduled' as const, 
+                    scheduledDate: sendLaterData.date,
+                    scheduledTime: sendLaterData.time 
+                }
+                : n
+        ));
+
+        alert(`Newsletter "${sendingNewsletter.title}" scheduled for ${sendLaterData.date} at ${sendLaterData.time}`);
+        setShowSendModal(false);
+        setSendingNewsletter(null);
+        setSendLaterData({ date: '', time: '' });
     };
 
     const sendSampleEmail = async () => {
@@ -532,12 +573,12 @@ export default function EmailsPage() {
                                 {newsletter.status === 'Draft' && (
                                     <div className="px-4 pb-4 pt-0 border-t border-gray-100">
                                         <button 
-                                            onClick={() => sendNewsletter(newsletter.id)}
+                                            onClick={() => openSendModal(newsletter)}
                                             disabled={sending}
                                             className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             <Send className="h-4 w-4" />
-                                            {sending ? 'Sending...' : 'Send Now'}
+                                            Send Newsletter
                                         </button>
                                     </div>
                                 )}
@@ -1010,6 +1051,83 @@ export default function EmailsPage() {
                         <button
                             onClick={() => setShowSampleEmailModal(false)}
                             className="flex-1 py-2 px-4 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Send Newsletter Modal */}
+            <Modal
+                isOpen={showSendModal}
+                onClose={() => setShowSendModal(false)}
+                title={sendingNewsletter ? `Send Newsletter: ${sendingNewsletter.title}` : 'Send Newsletter'}
+            >
+                <div className="space-y-6">
+                    <div className="text-center">
+                        <p className="text-gray-600 mb-4">
+                            Choose when to send this newsletter to your recipients.
+                        </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button
+                            onClick={handleSendNow}
+                            disabled={sending}
+                            className="p-6 border-2 border-green-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <div className="text-center">
+                                <Send className="h-8 w-8 text-green-600 mx-auto mb-3" />
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Send Now</h3>
+                                <p className="text-sm text-gray-600">
+                                    Send immediately to all recipients
+                                </p>
+                            </div>
+                        </button>
+                        
+                        <div className="p-6 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <div className="text-center mb-4">
+                                <Calendar className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Send Later</h3>
+                                <p className="text-sm text-gray-600 mb-4">
+                                    Schedule for a specific date and time
+                                </p>
+                            </div>
+                            
+                            <div className="space-y-3">
+                                <div>
+                                    <input
+                                        type="date"
+                                        value={sendLaterData.date}
+                                        onChange={(e) => setSendLaterData({...sendLaterData, date: e.target.value})}
+                                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        min={new Date().toISOString().split('T')[0]}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="time"
+                                        value={sendLaterData.time}
+                                        onChange={(e) => setSendLaterData({...sendLaterData, time: e.target.value})}
+                                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+                                <button
+                                    onClick={handleSendLater}
+                                    disabled={!sendLaterData.date || !sendLaterData.time}
+                                    className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Schedule Send
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-center pt-4">
+                        <button
+                            onClick={() => setShowSendModal(false)}
+                            className="py-2 px-6 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                         >
                             Cancel
                         </button>
