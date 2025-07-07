@@ -2,14 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { Users, Calendar, Heart, Clock, User, MapPin } from 'lucide-react';
+import { NewsletterService } from '../lib/database-models';
 
 export default function DashboardPage() {
-    // Mock data - replace with real API calls
     const [dashboardData, setDashboardData] = useState({
-        totalDonors: 128,
-        activeVolunteers: 45,
-        upcomingEvents: 3,
-        totalVolunteerHours: 312,
+        totalDonors: 0,
+        activeVolunteers: 0,
+        upcomingEvents: 0,
+        totalVolunteerHours: 0,
+        newsletterStats: {
+            total: 0,
+            sent: 0,
+            draft: 0,
+            scheduled: 0,
+            totalOpens: 0,
+            totalClicks: 0
+        },
         recentDonors: [
             { id: 1, name: 'John Smith', type: 'Individual', totalGiven: 2500, lastDonation: '2024-06-15' },
             { id: 2, name: 'ABC Foundation', type: 'Foundation', totalGiven: 10000, lastDonation: '2024-07-01' },
@@ -21,6 +29,54 @@ export default function DashboardPage() {
             { id: 3, name: 'Volunteer Training', date: '2024-07-25', location: 'Main Office', attendees: 25 }
         ]
     });
+
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                // Fetch newsletter stats from database
+                const newsletterStats = await NewsletterService.getStats();
+                
+                setDashboardData(prev => ({
+                    ...prev,
+                    newsletterStats,
+                    // Mock data for other stats - replace with real database calls
+                    totalDonors: 128,
+                    activeVolunteers: 45,
+                    upcomingEvents: 3,
+                    totalVolunteerHours: 312
+                }));
+            } catch (err) {
+                console.error('Error fetching dashboard data:', err);
+                setError('Failed to load dashboard data');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDashboardData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-700">{error}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -49,8 +105,8 @@ export default function DashboardPage() {
                 <div className="bg-purple-50 p-6 rounded-lg border border-purple-200">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-purple-600 text-sm font-medium">Upcoming Events</p>
-                            <p className="text-2xl font-bold text-purple-900">{dashboardData.upcomingEvents}</p>
+                            <p className="text-purple-600 text-sm font-medium">Newsletters Sent</p>
+                            <p className="text-2xl font-bold text-purple-900">{dashboardData.newsletterStats.sent}</p>
                         </div>
                         <Calendar className="h-8 w-8 text-purple-600" />
                     </div>
@@ -59,8 +115,8 @@ export default function DashboardPage() {
                 <div className="bg-orange-50 p-6 rounded-lg border border-orange-200">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-orange-600 text-sm font-medium">Total Vol. Hours</p>
-                            <p className="text-2xl font-bold text-orange-900">{dashboardData.totalVolunteerHours}</p>
+                            <p className="text-orange-600 text-sm font-medium">Total Opens</p>
+                            <p className="text-2xl font-bold text-orange-900">{dashboardData.newsletterStats.totalOpens}</p>
                         </div>
                         <Clock className="h-8 w-8 text-orange-600" />
                     </div>

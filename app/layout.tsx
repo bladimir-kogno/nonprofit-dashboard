@@ -1,7 +1,7 @@
 import '../styles/globals.css';
 import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
-import SideNav from '../components/layout/TopNav';
+import TopNav from '../components/layout/TopNav';
 import { Heart, User } from 'lucide-react';
 
 const inter = Inter({ 
@@ -61,7 +61,7 @@ export default function RootLayout({
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                             <div className="flex flex-col xl:flex-row gap-8">
                                 <div className="xl:w-64 flex-shrink-0">
-                                    <SideNav />
+                                    <TopNav />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     {children}

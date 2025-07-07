@@ -14,7 +14,7 @@ const navItems = [
     { label: 'Reports', href: '/reports', icon: FileText },
 ];
 
-export default function SideNav() {
+export default function TopNav() {
     const pathname = usePathname();
 
     return (
