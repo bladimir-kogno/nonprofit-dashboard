@@ -1,6 +1,6 @@
 import '../styles/globals.css';
 import { Inter } from 'next/font/google';
-import { ClerkProvider } from '@clerk/nextjs';
+// import { ClerkProvider } from '@clerk/nextjs';
 import SideNav from '../components/layout/TopNav';
 import { Heart, User } from 'lucide-react';
 
@@ -21,7 +21,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <ClerkProvider>
+        // <ClerkProvider>
             <html lang="en" className={inter.variable}>
                 <body className={`${inter.className} antialiased`}>
                     <div className="min-h-screen bg-gray-50">
@@ -71,7 +71,7 @@ export default function RootLayout({
                     </div>
                 </body>
             </html>
-        </ClerkProvider>
+        // </ClerkProvider>
     );
 }
 
