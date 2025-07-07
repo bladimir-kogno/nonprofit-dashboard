@@ -190,7 +190,7 @@ export default function EmailsPage() {
         const finalAccentColor = accentColor || '#DC4444';
         
         return `
-            <div style="max-width: 600px; margin: 0 auto; background: white; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; box-shadow: 0 0 40px rgba(0,0,0,0.1);">
+            <div style="max-width: 600px; margin: 0 auto; background: white; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; border: 2px solid #a855f7; border-radius: 8px;">
                 <!-- Header Section with improved logo -->
                 <div style="text-align: center; padding: 40px 24px 20px 24px; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
                     <!-- Logo Triangle -->
@@ -200,7 +200,7 @@ export default function EmailsPage() {
                     
                     <!-- Company Name -->
                     <div style="font-size: 13px; font-weight: 700; letter-spacing: 3px; color: #64748b; text-transform: uppercase; margin-bottom: 20px;">
-                        BLOCKCHAIN FIRM
+                        RISE FOR HOPE FOUNDATION
                     </div>
                 </div>
 
@@ -235,7 +235,7 @@ export default function EmailsPage() {
                     
                     <!-- Central Hexagon -->
                     <div style="position: relative; z-index: 10; text-align: center; margin-bottom: 40px;">
-                        <div style="display: inline-block; width: 100px; height: 100px; background: ${finalAccentColor}; position: relative; margin: 0 auto; box-shadow: 0 8px 25px rgba(0,0,0,0.15);" 
+                        <div style="display: inline-block; width: 100px; height: 100px; background: ${finalAccentColor}; position: relative; margin: 0 auto;" 
                              ${/* Hexagon shape using CSS clip-path */''}
                              style="clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);">
                             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px;">
@@ -253,7 +253,7 @@ export default function EmailsPage() {
                     <div style="position: relative; z-index: 10; text-align: center; max-width: 480px; margin: 0 auto;">
                         ${imageUrl ? `
                             <div style="margin: 30px 0;">
-                                <img src="${imageUrl}" alt="Newsletter Image" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
+                                <img src="${imageUrl}" alt="Newsletter Image" style="max-width: 100%; height: auto; border-radius: 12px;">
                             </div>
                         ` : ''}
                         
@@ -265,13 +265,13 @@ export default function EmailsPage() {
                         
                         ${ctaText && ctaUrl ? `
                             <div style="margin: 40px 0;">
-                                <a href="${ctaUrl}" style="display: inline-block; padding: 16px 40px; color: white; font-weight: 600; background-color: #1e293b; text-decoration: none; border-radius: 0; box-shadow: 0 4px 14px rgba(30, 41, 59, 0.4); font-size: 16px; letter-spacing: 0.5px; transition: all 0.3s ease;">${ctaText}</a>
+                                <a href="${ctaUrl}" style="display: inline-block; padding: 16px 40px; color: white; font-weight: 600; background-color: #1e293b; text-decoration: none; border-radius: 0; font-size: 16px; letter-spacing: 0.5px;">${ctaText}</a>
                             </div>
                         ` : ''}
                     </div>
                 </div>
 
-                <!-- Footer Section matching the uploaded design -->
+                <!-- Footer Section with Rise for Hope Foundation details -->
                 <div style="text-align: center; padding: 40px 32px; background: #f8fafc; border-top: 1px solid #e2e8f0;">
                     <!-- Social Icons (Twitter, Facebook, Instagram style) -->
                     <div style="margin-bottom: 24px;">
@@ -300,13 +300,16 @@ export default function EmailsPage() {
                         </div>
                     </div>
                     
-                    <!-- Footer Text -->
-                    <div style="font-size: 13px; color: #94a3b8; line-height: 1.5;">
-                        <p style="margin: 0; font-weight: 600;">©${new Date().getFullYear()} Blockchain Firm,</p>
-                        <p style="margin: 4px 0 0 0;">SRP Stratford, OMR, PTK Nagar,</p>
-                        <p style="margin: 2px 0 0 0;">Thiruvanmiyur, Chennai,</p>
-                        <p style="margin: 2px 0 0 0;">Tamil Nadu 600041</p>
-                        <p style="margin: 16px 0 0 0; font-weight: 500;">All rights reserved.</p>
+                    <!-- Rise for Hope Foundation Details -->
+                    <div style="font-size: 13px; color: #94a3b8; line-height: 1.6; margin-bottom: 20px;">
+                        <p style="margin: 0; font-weight: 600; color: #64748b;">Rise for Hope Foundation</p>
+                        <p style="margin: 4px 0 0 0;">568 3rd Street, East Greenville, PA 18041</p>
+                        <p style="margin: 4px 0 0 0;">EIN: 33-4151218</p>
+                    </div>
+                    
+                    <!-- Unsubscribe Text -->
+                    <div style="font-size: 12px; color: #94a3b8; line-height: 1.5; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+                        <p style="margin: 0;">You're receiving this email because you opted in. To update your preferences or unsubscribe, <a href="#" style="color: #a855f7; text-decoration: none;">click here</a>.</p>
                     </div>
                 </div>
             </div>
