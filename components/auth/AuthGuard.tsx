@@ -158,11 +158,11 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
     return (
         <div>
-            {/* Logout button in top right */}
-            <div className="fixed top-4 right-4 z-50">
+            {/* Logout button - positioned to avoid header overlap on mobile */}
+            <div className="fixed top-20 sm:top-4 right-4 z-50">
                 <button
                     onClick={handleLogout}
-                    className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors"
+                    className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors shadow-lg"
                 >
                     Logout
                 </button>
