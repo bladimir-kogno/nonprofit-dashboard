@@ -3,28 +3,31 @@ import nodemailer from 'nodemailer';
 
 // Email service configuration
 const createTransporter = () => {
-    // For development, you can use a service like Gmail, SendGrid, or Mailtrap
-    // For production, use SendGrid, AWS SES, or similar
-    
-    // Example for Gmail (requires app password)
-    // return nodemailer.createTransport({
-    //     service: 'gmail',
-    //     auth: {
-    //         user: process.env.EMAIL_USER,
-    //         pass: process.env.EMAIL_PASSWORD
-    //     }
-    // });
+    // Gmail SMTP Configuration
+    if (process.env.EMAIL_HOST === 'smtp.gmail.com' && process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
+        return nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            port: parseInt(process.env.EMAIL_PORT || '587'),
+            secure: false, // true for 465, false for other ports
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASSWORD
+            }
+        });
+    }
 
-    // Example for SendGrid
-    // return nodemailer.createTransport({
-    //     host: 'smtp.sendgrid.net',
-    //     port: 587,
-    //     secure: false,
-    //     auth: {
-    //         user: 'apikey',
-    //         pass: process.env.SENDGRID_API_KEY
-    //     }
-    // });
+    // SendGrid Configuration (fallback)
+    if (process.env.SENDGRID_API_KEY) {
+        return nodemailer.createTransport({
+            host: 'smtp.sendgrid.net',
+            port: 587,
+            secure: false,
+            auth: {
+                user: 'apikey',
+                pass: process.env.SENDGRID_API_KEY
+            }
+        });
+    }
 
     // For development/testing - using Ethereal Email (fake SMTP)
     return nodemailer.createTransport({
