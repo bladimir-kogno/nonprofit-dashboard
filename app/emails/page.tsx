@@ -1081,6 +1081,7 @@ export default function EmailsPage() {
                             {formData.useTemplate && (
                                 <div className="border-t border-gray-200 pt-6">
                                     <h4 className="text-lg font-medium text-gray-900 mb-4">Newsletter Template Builder</h4>
+                                <p className="text-sm text-gray-500 mb-4">Create beautiful newsletters with custom content and styling</p>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-4">
                                             <div>
