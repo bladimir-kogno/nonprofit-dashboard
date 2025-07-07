@@ -6,6 +6,78 @@ import { useState } from 'react';
 import { BarChart3, Users, Heart, Calendar, TrendingUp } from 'lucide-react';
 
 export default function ReportsPage() {
+    const handleExportDonationReport = () => {
+        // Create CSV content
+        const headers = ['Name', 'Type', 'Total Given', 'Date'];
+        const rows = donors.map(donor => [
+            donor.name,
+            donor.type,
+            `$${donor.totalGiven}`,
+            new Date().toISOString().split('T')[0]
+        ]);
+        
+        const csvContent = [headers, ...rows]
+            .map(row => row.join(','))
+            .join('\n');
+        
+        // Download CSV
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `donation-report-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+
+    const handleExportVolunteerReport = () => {
+        // Create CSV content
+        const headers = ['Name', 'Status', 'Total Hours', 'Date'];
+        const rows = volunteers.map(volunteer => [
+            volunteer.name,
+            volunteer.status,
+            volunteer.totalHours,
+            new Date().toISOString().split('T')[0]
+        ]);
+        
+        const csvContent = [headers, ...rows]
+            .map(row => row.join(','))
+            .join('\n');
+        
+        // Download CSV
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `volunteer-report-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+
+    const handleExportEventReport = () => {
+        // Create CSV content
+        const headers = ['Event Name', 'Status', 'Attendees', 'Date'];
+        const rows = events.map(event => [
+            event.name,
+            event.status,
+            event.attendees,
+            new Date().toISOString().split('T')[0]
+        ]);
+        
+        const csvContent = [headers, ...rows]
+            .map(row => row.join(','))
+            .join('\n');
+        
+        // Download CSV
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `event-report-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+
     // Mock data - replace with real API calls
     const donors = [
         { id: 1, name: 'John Smith', type: 'Individual', totalGiven: 2500 },
@@ -186,19 +258,28 @@ export default function ReportsPage() {
             <div className="bg-white p-6 rounded-lg border border-gray-200">
                 <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-left hover:bg-blue-100 transition-colors">
+                    <button 
+                        onClick={handleExportDonationReport}
+                        className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-left hover:bg-blue-100 transition-colors"
+                    >
                         <BarChart3 className="h-8 w-8 text-blue-600 mb-2" />
                         <p className="font-medium text-blue-900">Export Donation Report</p>
                         <p className="text-sm text-blue-600">Download detailed donation analytics</p>
                     </button>
                     
-                    <button className="p-4 bg-green-50 border border-green-200 rounded-lg text-left hover:bg-green-100 transition-colors">
+                    <button 
+                        onClick={handleExportVolunteerReport}
+                        className="p-4 bg-green-50 border border-green-200 rounded-lg text-left hover:bg-green-100 transition-colors"
+                    >
                         <Users className="h-8 w-8 text-green-600 mb-2" />
                         <p className="font-medium text-green-900">Volunteer Hours Report</p>
                         <p className="text-sm text-green-600">Generate volunteer time tracking</p>
                     </button>
                     
-                    <button className="p-4 bg-purple-50 border border-purple-200 rounded-lg text-left hover:bg-purple-100 transition-colors">
+                    <button 
+                        onClick={handleExportEventReport}
+                        className="p-4 bg-purple-50 border border-purple-200 rounded-lg text-left hover:bg-purple-100 transition-colors"
+                    >
                         <Calendar className="h-8 w-8 text-purple-600 mb-2" />
                         <p className="font-medium text-purple-900">Event Analytics</p>
                         <p className="text-sm text-purple-600">View event performance metrics</p>

@@ -29,9 +29,12 @@ interface Newsletter {
 interface AutomatedEmail {
     id: number;
     name: string;
-    trigger: 'new_donor' | 'donation_received' | 'volunteer_signup' | 'event_registration';
+    trigger: 'new_donor' | 'donation_received' | 'volunteer_signup' | 'event_registration' | 'scheduled';
     template: string;
     active: boolean;
+    scheduledDate?: string;
+    scheduledTime?: string;
+    contactList?: string;
 }
 
 export default function EmailsPage() {
@@ -110,6 +113,16 @@ export default function EmailsPage() {
             trigger: 'volunteer_signup', 
             template: 'Welcome New Donor', 
             active: false 
+        },
+        { 
+            id: 4, 
+            name: 'Monthly Newsletter', 
+            trigger: 'scheduled', 
+            template: 'Welcome New Donor', 
+            active: true,
+            scheduledDate: '2024-08-01',
+            scheduledTime: '09:00',
+            contactList: 'All Donors'
         }
     ]);
 
@@ -162,7 +175,7 @@ export default function EmailsPage() {
             } else if (type === 'template') {
                 setFormData({ name: '', subject: '', content: '', htmlContent: '', type: 'welcome' });
             } else if (type === 'automation') {
-                setFormData({ name: '', trigger: 'new_donor', template: '', active: true });
+                setFormData({ name: '', trigger: 'new_donor', template: '', active: true, scheduledDate: '', scheduledTime: '', contactList: '' });
             }
         }
         setShowModal(true);
@@ -599,9 +612,15 @@ export default function EmailsPage() {
                                             <p className="text-sm text-gray-600 mb-1">
                                                 <span className="font-medium">Trigger:</span> {automation.trigger.replace('_', ' ').toLowerCase()}
                                             </p>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-sm text-gray-600 mb-1">
                                                 <span className="font-medium">Template:</span> {automation.template}
                                             </p>
+                                            {automation.trigger === 'scheduled' && (
+                                                <div className="text-sm text-gray-600 space-y-1 mt-2">
+                                                    <p><span className="font-medium">Scheduled:</span> {automation.scheduledDate} at {automation.scheduledTime}</p>
+                                                    <p><span className="font-medium">Contact List:</span> {automation.contactList}</p>
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="flex flex-col items-end gap-3">
                                             <button
@@ -756,55 +775,111 @@ export default function EmailsPage() {
                     )}
 
                     {modalType === 'automation' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Automation Name
-                                </label>
-                                <input
-                                    type="text"
-                                    placeholder="Enter automation name"
-                                    value={formData.name || ''}
-                                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                    required
-                                />
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Automation Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter automation name"
+                                        value={formData.name || ''}
+                                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Trigger Event
+                                    </label>
+                                    <select
+                                        value={formData.trigger || ''}
+                                        onChange={(e) => setFormData({...formData, trigger: e.target.value})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                        required
+                                    >
+                                        <option value="">Select Trigger</option>
+                                        <option value="new_donor">New Donor Registration</option>
+                                        <option value="donation_received">Donation Received</option>
+                                        <option value="volunteer_signup">Volunteer Signup</option>
+                                        <option value="event_registration">Event Registration</option>
+                                        <option value="scheduled">Scheduled Send</option>
+                                    </select>
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Email Template
+                                    </label>
+                                    <select
+                                        value={formData.template || ''}
+                                        onChange={(e) => setFormData({...formData, template: e.target.value})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                        required
+                                    >
+                                        <option value="">Select Email Template</option>
+                                        {emailTemplates.map(template => (
+                                            <option key={template.id} value={template.name}>
+                                                {template.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Trigger Event
-                                </label>
-                                <select
-                                    value={formData.trigger || ''}
-                                    onChange={(e) => setFormData({...formData, trigger: e.target.value})}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                    required
-                                >
-                                    <option value="">Select Trigger</option>
-                                    <option value="new_donor">New Donor Registration</option>
-                                    <option value="donation_received">Donation Received</option>
-                                    <option value="volunteer_signup">Volunteer Signup</option>
-                                    <option value="event_registration">Event Registration</option>
-                                </select>
-                            </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Email Template
-                                </label>
-                                <select
-                                    value={formData.template || ''}
-                                    onChange={(e) => setFormData({...formData, template: e.target.value})}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                    required
-                                >
-                                    <option value="">Select Email Template</option>
-                                    {emailTemplates.map(template => (
-                                        <option key={template.id} value={template.name}>
-                                            {template.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+
+                            {/* Scheduling Fields - only show when trigger is 'scheduled' */}
+                            {formData.trigger === 'scheduled' && (
+                                <div className="border-t border-gray-200 pt-6">
+                                    <h4 className="text-lg font-medium text-gray-900 mb-4">Schedule Settings</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Send Date
+                                            </label>
+                                            <input
+                                                type="date"
+                                                value={formData.scheduledDate || ''}
+                                                onChange={(e) => setFormData({...formData, scheduledDate: e.target.value})}
+                                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Send Time
+                                            </label>
+                                            <input
+                                                type="time"
+                                                value={formData.scheduledTime || ''}
+                                                onChange={(e) => setFormData({...formData, scheduledTime: e.target.value})}
+                                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Contact List
+                                            </label>
+                                            <select
+                                                value={formData.contactList || ''}
+                                                onChange={(e) => setFormData({...formData, contactList: e.target.value})}
+                                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                                required
+                                            >
+                                                <option value="">Select Contact List</option>
+                                                <option value="All Donors">All Donors</option>
+                                                <option value="All Volunteers">All Volunteers</option>
+                                                <option value="All Contacts">All Contacts</option>
+                                                <option value="Active Volunteers">Active Volunteers</option>
+                                                <option value="Individual Donors">Individual Donors</option>
+                                                <option value="Corporate Donors">Corporate Donors</option>
+                                                <option value="Foundation Donors">Foundation Donors</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                     
