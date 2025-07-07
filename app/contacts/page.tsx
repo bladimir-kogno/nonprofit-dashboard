@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Upload, Search, Mail, Phone, Building, User, Download, Trash2, Plus } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import Modal from '../../components/shared/Modal';
 
 interface Contact {
     id: string;
@@ -20,6 +21,8 @@ export default function ContactsPage() {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadStatus, setUploadStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [showAddContactModal, setShowAddContactModal] = useState(false);
+    const [newContactData, setNewContactData] = useState({ name: '', company: '', email: '', phone: '' });
 
     // Load contacts from localStorage on component mount
     useEffect(() => {
@@ -156,11 +159,43 @@ export default function ContactsPage() {
         }
     };
 
+    const handleAddContact = (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        // Check for duplicate email
+        const existingContact = contacts.find(c => c.email.toLowerCase() === newContactData.email.toLowerCase());
+        if (existingContact) {
+            alert('A contact with this email already exists.');
+            return;
+        }
+
+        const newContact: Contact = {
+            id: crypto.randomUUID(),
+            name: newContactData.name.trim(),
+            company: newContactData.company.trim(),
+            email: newContactData.email.trim(),
+            phone: newContactData.phone.trim(),
+            dateAdded: new Date().toISOString().split('T')[0]
+        };
+
+        setContacts(prev => [newContact, ...prev]);
+        setShowAddContactModal(false);
+        setNewContactData({ name: '', company: '', email: '', phone: '' });
+        setUploadStatus({ type: 'success', message: `Successfully added ${newContact.name} to contacts.` });
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold text-gray-900">Contact Management</h1>
                 <div className="flex gap-3">
+                    <button
+                        onClick={() => setShowAddContactModal(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Add Contact
+                    </button>
                     <button
                         onClick={handleExportContacts}
                         disabled={contacts.length === 0}
@@ -311,6 +346,85 @@ export default function ContactsPage() {
                     <li>• Click email addresses to send emails directly</li>
                 </ul>
             </div>
+
+            {/* Add Contact Modal */}
+            <Modal
+                isOpen={showAddContactModal}
+                onClose={() => setShowAddContactModal(false)}
+                title="Add New Contact"
+            >
+                <form onSubmit={handleAddContact} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Full Name *
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Enter full name"
+                            value={newContactData.name}
+                            onChange={(e) => setNewContactData({...newContactData, name: e.target.value})}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
+                    
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Company/Organization
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Enter company or organization"
+                            value={newContactData.company}
+                            onChange={(e) => setNewContactData({...newContactData, company: e.target.value})}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                    
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address *
+                        </label>
+                        <input
+                            type="email"
+                            placeholder="Enter email address"
+                            value={newContactData.email}
+                            onChange={(e) => setNewContactData({...newContactData, email: e.target.value})}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
+                    
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Phone Number
+                        </label>
+                        <input
+                            type="tel"
+                            placeholder="Enter phone number"
+                            value={newContactData.phone}
+                            onChange={(e) => setNewContactData({...newContactData, phone: e.target.value})}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                    
+                    <div className="flex gap-3 pt-4">
+                        <button
+                            type="submit"
+                            className="flex-1 py-2 px-4 rounded-lg text-white font-medium bg-blue-600 hover:bg-blue-700"
+                        >
+                            Add Contact
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowAddContactModal(false)}
+                            className="flex-1 py-2 px-4 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 }
