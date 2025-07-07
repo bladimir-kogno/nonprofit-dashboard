@@ -24,6 +24,8 @@ interface Newsletter {
     recipients: number;
     created: string;
     scheduledFor?: string;
+    scheduledDate?: string;
+    scheduledTime?: string;
 }
 
 interface AutomatedEmail {
@@ -171,7 +173,7 @@ export default function EmailsPage() {
             setFormData(item);
         } else {
             if (type === 'newsletter') {
-                setFormData({ title: '', subject: '', content: '', htmlContent: '', status: 'Draft' });
+                setFormData({ title: '', subject: '', content: '', htmlContent: '', status: 'Draft', scheduledDate: '', scheduledTime: '' });
             } else if (type === 'template') {
                 setFormData({ name: '', subject: '', content: '', htmlContent: '', type: 'welcome' });
             } else if (type === 'automation') {
@@ -496,6 +498,12 @@ export default function EmailsPage() {
                                                     <Users className="h-4 w-4" />
                                                     Recipients: {newsletter.recipients}
                                                 </span>
+                                                {newsletter.status === 'Scheduled' && newsletter.scheduledDate && newsletter.scheduledTime && (
+                                                    <span className="flex items-center gap-1">
+                                                        <Calendar className="h-4 w-4" />
+                                                        Scheduled: {newsletter.scheduledDate} at {newsletter.scheduledTime}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-end gap-3">
@@ -671,44 +679,87 @@ export default function EmailsPage() {
             >
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {modalType === 'newsletter' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Newsletter Title
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter newsletter title"
-                                        value={formData.title || ''}
-                                        onChange={(e) => setFormData({...formData, title: e.target.value})}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        required
-                                    />
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Newsletter Title
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="Enter newsletter title"
+                                            value={formData.title || ''}
+                                            onChange={(e) => setFormData({...formData, title: e.target.value})}
+                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Email Subject
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="Enter email subject"
+                                            value={formData.subject || ''}
+                                            onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Status
+                                        </label>
+                                        <select
+                                            value={formData.status || 'Draft'}
+                                            onChange={(e) => setFormData({...formData, status: e.target.value})}
+                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        >
+                                            <option value="Draft">Draft</option>
+                                            <option value="Scheduled">Schedule for Later</option>
+                                        </select>
+                                    </div>
+                                    {formData.status === 'Scheduled' && (
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Send Date
+                                                </label>
+                                                <input
+                                                    type="date"
+                                                    value={formData.scheduledDate || ''}
+                                                    onChange={(e) => setFormData({...formData, scheduledDate: e.target.value})}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Send Time
+                                                </label>
+                                                <input
+                                                    type="time"
+                                                    value={formData.scheduledTime || ''}
+                                                    onChange={(e) => setFormData({...formData, scheduledTime: e.target.value})}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Email Subject
+                                        Newsletter Content
                                     </label>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter email subject"
-                                        value={formData.subject || ''}
-                                        onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        required
+                                    <HTMLEditor
+                                        content={formData.htmlContent || ''}
+                                        onChange={(html) => setFormData({...formData, htmlContent: html, content: html.replace(/<[^>]*>/g, '')})}
+                                        placeholder="Write your newsletter content here..."
                                     />
                                 </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Newsletter Content
-                                </label>
-                                <HTMLEditor
-                                    content={formData.htmlContent || ''}
-                                    onChange={(html) => setFormData({...formData, htmlContent: html, content: html.replace(/<[^>]*>/g, '')})}
-                                    placeholder="Write your newsletter content here..."
-                                />
                             </div>
                         </div>
                     )}
