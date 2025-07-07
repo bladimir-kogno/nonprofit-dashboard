@@ -32,10 +32,10 @@ interface Newsletter {
         title?: string;
         subtitle?: string;
         imageUrl?: string;
-        quotation?: string;
         bodyText?: string;
         ctaText?: string;
         ctaUrl?: string;
+        accentColor?: string;
     };
 }
 
@@ -186,123 +186,127 @@ export default function EmailsPage() {
     };
 
     const generateTemplateHTML = (templateData: any) => {
-        const { title, subtitle, imageUrl, quotation, bodyText, ctaText, ctaUrl, accentColor } = templateData;
+        const { title, subtitle, imageUrl, bodyText, ctaText, ctaUrl, accentColor } = templateData;
         const finalAccentColor = accentColor || '#DC4444';
         
         return `
-            <div style="max-width: 600px; margin: 0 auto; background: white; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
-                <!-- Header Section -->
-                <div style="text-align: center; padding: 32px 24px;">
-                    <!-- Logo -->
-                    <div style="margin-bottom: 24px;">
-                                                 <div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin-bottom: 16px; background-color: ${finalAccentColor};">
-                             <div style="width: 32px; height: 32px; background: white; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); transform: rotate(180deg);"></div>
-                         </div>
+            <div style="max-width: 600px; margin: 0 auto; background: white; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; box-shadow: 0 0 40px rgba(0,0,0,0.1);">
+                <!-- Header Section with improved logo -->
+                <div style="text-align: center; padding: 40px 24px 20px 24px; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+                    <!-- Logo Triangle -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: inline-block; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 35px solid ${finalAccentColor}; margin-bottom: 12px;"></div>
                     </div>
                     
                     <!-- Company Name -->
-                    <div style="font-size: 14px; font-weight: 600; letter-spacing: 2px; color: #6B7280; text-transform: uppercase; margin-bottom: 24px;">
-                        Your Organization
+                    <div style="font-size: 13px; font-weight: 700; letter-spacing: 3px; color: #64748b; text-transform: uppercase; margin-bottom: 20px;">
+                        BLOCKCHAIN FIRM
                     </div>
-                    
-                    <!-- Main Headline -->
-                    <h1 style="font-size: 32px; font-weight: bold; color: #1F2937; line-height: 1.2; margin: 0 0 16px 0;">
-                        ${title || 'Get All Your Updates In One Spot'}
-                    </h1>
-                    
-                    ${subtitle ? `<p style="font-size: 16px; color: #6B7280; margin: 0;">${subtitle}</p>` : ''}
                 </div>
 
-                <!-- Geometric Design Section -->
-                <div style="position: relative; padding: 48px 24px; overflow: hidden;">
-                    <!-- Background geometric elements -->
-                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
-                        <!-- Large background circles -->
-                        <div style="position: absolute; width: 128px; height: 128px; background-color: #F3F4F6; border-radius: 50%; opacity: 0.6; top: -32px; left: -32px;"></div>
-                        <div style="position: absolute; width: 96px; height: 96px; background-color: #F3F4F6; border-radius: 50%; opacity: 0.4; top: 64px; right: 48px;"></div>
-                        <div style="position: absolute; width: 80px; height: 80px; background-color: #F3F4F6; border-radius: 50%; opacity: 0.5; bottom: 32px; left: 64px;"></div>
-                        <div style="position: absolute; width: 64px; height: 64px; background-color: #F3F4F6; border-radius: 50%; opacity: 0.3; bottom: 64px; right: 32px;"></div>
+                <!-- Main Content Section -->
+                <div style="padding: 40px 32px; text-align: center; background: white;">
+                    <!-- Main Headline -->
+                    <h1 style="font-size: 36px; font-weight: 800; color: #1e293b; line-height: 1.1; margin: 0 0 16px 0; letter-spacing: -0.5px;">
+                        ${title || 'Get All Your Tech Fixin\'s In One Spot.'}
+                    </h1>
+                    
+                    ${subtitle ? `<p style="font-size: 18px; color: #64748b; margin: 0 0 32px 0; font-weight: 500;">${subtitle}</p>` : ''}
+                </div>
+
+                <!-- Geometric Art Section -->
+                <div style="position: relative; padding: 60px 32px; overflow: hidden; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);">
+                    <!-- Background Shapes -->
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.4;">
+                        <!-- Large circles -->
+                        <div style="position: absolute; width: 200px; height: 200px; background: radial-gradient(circle, #e2e8f0 0%, transparent 70%); border-radius: 50%; top: -100px; left: -100px;"></div>
+                        <div style="position: absolute; width: 150px; height: 150px; background: radial-gradient(circle, #cbd5e1 0%, transparent 70%); border-radius: 50%; top: 50px; right: -75px;"></div>
+                        <div style="position: absolute; width: 120px; height: 120px; background: radial-gradient(circle, #e2e8f0 0%, transparent 70%); border-radius: 50%; bottom: -60px; left: 40px;"></div>
                         
-                        <!-- Decorative lines -->
-                        <div style="position: absolute; width: 96px; height: 2px; background-color: #E5E7EB; top: 80px; left: 80px; transform: rotate(45deg);"></div>
-                        <div style="position: absolute; width: 64px; height: 2px; background-color: #E5E7EB; bottom: 96px; right: 64px; transform: rotate(-45deg);"></div>
+                        <!-- Geometric lines -->
+                        <div style="position: absolute; width: 100px; height: 2px; background: linear-gradient(90deg, transparent 0%, #cbd5e1 50%, transparent 100%); top: 80px; left: 50px; transform: rotate(45deg);"></div>
+                        <div style="position: absolute; width: 80px; height: 2px; background: linear-gradient(90deg, transparent 0%, #cbd5e1 50%, transparent 100%); bottom: 100px; right: 60px; transform: rotate(-30deg);"></div>
                         
-                        <!-- Small geometric shapes -->
-                        <div style="position: absolute; width: 24px; height: 24px; background-color: #E5E7EB; top: 128px; left: 32px; transform: rotate(45deg);"></div>
-                        <div style="position: absolute; width: 16px; height: 16px; background-color: #E5E7EB; bottom: 128px; right: 80px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
+                        <!-- Small shapes -->
+                        <div style="position: absolute; width: 20px; height: 20px; background: #cbd5e1; top: 120px; left: 50px; transform: rotate(45deg);"></div>
+                        <div style="position: absolute; width: 16px; height: 16px; background: #e2e8f0; bottom: 140px; right: 100px; border-radius: 50%;"></div>
+                        <div style="position: absolute; width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-bottom: 20px solid #cbd5e1; bottom: 120px; left: 80px;"></div>
                     </div>
                     
-                    <!-- Central hexagon with logo -->
-                    <div style="position: relative; z-index: 10; text-align: center; margin-bottom: 32px;">
-                                                 <div style="display: inline-block; width: 80px; height: 80px; background-color: ${finalAccentColor}; clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                            <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 32px; height: 32px;">
-                                    <div style="background: white; width: 100%; height: 100%;"></div>
-                                    <div style="background: white; width: 100%; height: 100%;"></div>
-                                    <div style="background: white; width: 100%; height: 100%;"></div>
-                                    <div style="background: white; width: 100%; height: 100%;"></div>
+                    <!-- Central Hexagon -->
+                    <div style="position: relative; z-index: 10; text-align: center; margin-bottom: 40px;">
+                        <div style="display: inline-block; width: 100px; height: 100px; background: ${finalAccentColor}; position: relative; margin: 0 auto; box-shadow: 0 8px 25px rgba(0,0,0,0.15);" 
+                             ${/* Hexagon shape using CSS clip-path */''}
+                             style="clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);">
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 100%; height: 100%;">
+                                    <div style="background: white; border-radius: 2px;"></div>
+                                    <div style="background: white; border-radius: 2px;"></div>
+                                    <div style="background: white; border-radius: 2px;"></div>
+                                    <div style="background: white; border-radius: 2px;"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Content -->
-                    <div style="position: relative; z-index: 10; text-align: center;">
+                    <!-- Content Area -->
+                    <div style="position: relative; z-index: 10; text-align: center; max-width: 480px; margin: 0 auto;">
                         ${imageUrl ? `
-                            <div style="text-align: center; margin: 30px 0;">
-                                <img src="${imageUrl}" alt="Newsletter Image" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                            <div style="margin: 30px 0;">
+                                <img src="${imageUrl}" alt="Newsletter Image" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
                             </div>
                         ` : ''}
                         
-                        ${quotation ? `
-                                                         <blockquote style="background-color: #F9FAFB; border-left: 4px solid ${finalAccentColor}; padding: 20px; margin: 30px auto; font-style: italic; font-size: 18px; max-width: 400px; text-align: left;">
-                                "${quotation}"
-                            </blockquote>
-                        ` : ''}
-                        
                         ${bodyText ? `
-                            <p style="color: #6B7280; line-height: 1.6; margin: 32px auto; max-width: 400px; font-size: 16px;">
+                            <p style="color: #475569; line-height: 1.7; margin: 32px auto; font-size: 16px; font-weight: 400;">
                                 ${bodyText.replace(/\n/g, '<br>')}
                             </p>
                         ` : ''}
                         
                         ${ctaText && ctaUrl ? `
-                            <a href="${ctaUrl}" style="display: inline-block; padding: 12px 32px; color: white; font-weight: 500; background-color: #333333; text-decoration: none; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border-radius: 0; margin-top: 16px; transition: box-shadow 0.3s ease;">${ctaText}</a>
+                            <div style="margin: 40px 0;">
+                                <a href="${ctaUrl}" style="display: inline-block; padding: 16px 40px; color: white; font-weight: 600; background-color: #1e293b; text-decoration: none; border-radius: 0; box-shadow: 0 4px 14px rgba(30, 41, 59, 0.4); font-size: 16px; letter-spacing: 0.5px; transition: all 0.3s ease;">${ctaText}</a>
+                            </div>
                         ` : ''}
                     </div>
                 </div>
 
-                <!-- Footer Section -->
-                <div style="text-align: center; padding: 32px 24px; background-color: #F9FAFB;">
-                    <p style="color: #6B7280; margin: 0 0 16px 0; font-weight: 500;">
-                        Kind Regards,
-                    </p>
-                    
-                    <div style="font-size: 14px; color: #9CA3AF; line-height: 1.4;">
-                        <p style="margin: 0; font-weight: 500;">©${new Date().getFullYear()} Your Organization,</p>
-                        <p style="margin: 4px 0;">123 Nonprofit Street, City, State 12345</p>
-                        <p style="margin: 4px 0;">United States</p>
-                        <p style="margin: 16px 0 0 0;">All rights reserved.</p>
-                    </div>
-
-                    <!-- Social Links Placeholder -->
-                    <div style="display: flex; justify-content: center; gap: 24px; margin: 24px 0;">
-                        <div style="width: 32px; height: 32px; background-color: #D1D5DB; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <div style="width: 16px; height: 16px; background-color: #9CA3AF; border-radius: 50%;"></div>
-                        </div>
-                        <div style="width: 32px; height: 32px; background-color: #D1D5DB; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <div style="width: 16px; height: 16px; background-color: #9CA3AF; border-radius: 50%;"></div>
-                        </div>
-                        <div style="width: 32px; height: 32px; background-color: #D1D5DB; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <div style="width: 16px; height: 16px; background-color: #9CA3AF; border-radius: 50%;"></div>
+                <!-- Footer Section matching the uploaded design -->
+                <div style="text-align: center; padding: 40px 32px; background: #f8fafc; border-top: 1px solid #e2e8f0;">
+                    <!-- Social Icons (Twitter, Facebook, Instagram style) -->
+                    <div style="margin-bottom: 24px;">
+                        <div style="display: inline-flex; gap: 16px;">
+                            <!-- Twitter Icon -->
+                            <div style="width: 40px; height: 40px; background-color: #94a3b8; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <div style="width: 20px; height: 16px; background-color: white; mask: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAyMCAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIwIDEuOTJDMTkuMjYgMi4yNiAxOC40NiAyLjQ5IDE3LjY0IDIuNkMxOC41IDIuMDQgMTkuMTMgMS4xOSAxOS40NCAwLjE5QzE4LjY0IDAuNzEgMTcuNzMgMS4wOSAxNi43NiAxLjMxQzE2IDAuNDggMTQuOTUgMCAxMy43OSAwQzExLjU0IDAgOS43NCAxLjc5IDkuNzQgNC4wMUM5Ljc0IDQuNDEgOS43OCA0LjggOS44NiA1LjE4QzYuNDQgNSA0LjQxIDMuNjggMS44MiAwLjg2QzEuNDEgMS41NyAxLjE4IDIuMzcgMS4xOCAzLjIxQzEuMTggNC44NyAyLjEyIDYuMyAzLjUyIDcuMTFDMi43IDcuMDkgMS45NCA2Ljg3IDEuMjggNi41VjYuNTdDMS4yOCA4LjYgMi43MyAxMC4yOSA0LjY2IDEwLjc0QzQuMjggMTAuODMgMy44NyAxMC44OCAzLjQ2IDEwLjg4QzMuMTYgMTAuODggMi44OCAxMC44NSAyLjYxIDEwLjhDMy4xNiAxMi41IDQuNzMgMTMuNzQgNi42IDE0LjA3QzUuMTYgMTUuMjIgMy4zMiAxNS45IDEuMzMgMTUuOUM5LjE0IDE1LjkgMTEuODggMTUuOSAxMS44OCAxNUMxMS44OCAxNC43OSAxMS44NyAxNC41OCAxMS44NSAxNC4zOEMxMi42MSAxMy44NyAxMy4yOCAxMy4yMyAxMy44MyAxMi40OUMxMy4wNyAxMi44IDEyLjI0IDEzIDExLjM3IDEzLjA4QzEyLjI0IDEyLjU0IDEyLjkgMTEuNzEgMTMuMiAxMC43M0MxMi40MyAxMS4zMSAxMS41NSAxMS43NCAxMC42IDEyQzEwLjYgMTIgOS43OCAyMCA5Ljc4IDEyIi8+Cjwvc3ZnPgo=') center/contain no-repeat;"></div>
+                            </div>
+                            <!-- Facebook Icon -->
+                            <div style="width: 40px; height: 40px; background-color: #94a3b8; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <div style="width: 20px; height: 20px; background-color: white; border-radius: 50%;"></div>
+                            </div>
+                            <!-- Instagram Icon -->
+                            <div style="width: 40px; height: 40px; background-color: #94a3b8; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <div style="width: 16px; height: 16px; background-color: white; border-radius: 3px;"></div>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Footer links -->
-                    <div style="display: flex; justify-content: center; gap: 24px; font-size: 14px; color: #9CA3AF;">
-                        <a href="#" style="color: #9CA3AF; text-decoration: none;">Our Blog</a>
-                        <a href="#" style="color: #9CA3AF; text-decoration: none;">Unsubscribe</a>
-                        <a href="#" style="color: #9CA3AF; text-decoration: none;">Policies</a>
+                    <!-- Footer Links -->
+                    <div style="margin-bottom: 24px;">
+                        <div style="display: inline-flex; gap: 24px; font-size: 14px;">
+                            <a href="#" style="color: #64748b; text-decoration: none; font-weight: 500;">Our Blog</a>
+                            <a href="#" style="color: #64748b; text-decoration: none; font-weight: 500;">Unsubscribe</a>
+                            <a href="#" style="color: #64748b; text-decoration: none; font-weight: 500;">Policies</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer Text -->
+                    <div style="font-size: 13px; color: #94a3b8; line-height: 1.5;">
+                        <p style="margin: 0; font-weight: 600;">©${new Date().getFullYear()} Blockchain Firm,</p>
+                        <p style="margin: 4px 0 0 0;">SRP Stratford, OMR, PTK Nagar,</p>
+                        <p style="margin: 2px 0 0 0;">Thiruvanmiyur, Chennai,</p>
+                        <p style="margin: 2px 0 0 0;">Tamil Nadu 600041</p>
+                        <p style="margin: 16px 0 0 0; font-weight: 500;">All rights reserved.</p>
                     </div>
                 </div>
             </div>
@@ -357,10 +361,10 @@ export default function EmailsPage() {
                         title: '',
                         subtitle: '',
                         imageUrl: '',
-                        quotation: '',
                         bodyText: '',
                         ctaText: '',
-                        ctaUrl: ''
+                        ctaUrl: '',
+                        accentColor: '#DC4444'
                     }
                 });
             } else if (type === 'template') {
@@ -1150,21 +1154,7 @@ export default function EmailsPage() {
                                                     })}
                                                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                    Featured Quote
-                                                </label>
-                                                <textarea
-                                                    placeholder="Add an inspiring quote or message"
-                                                    value={formData.templateData?.quotation || ''}
-                                                    onChange={(e) => setFormData({
-                                                        ...formData, 
-                                                        templateData: {...formData.templateData, quotation: e.target.value}
-                                                    })}
-                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                    rows={3}
-                                                />
+                                                <p className="text-xs text-gray-500 mt-1">Optional: Add a header image to your newsletter</p>
                                             </div>
                                         </div>
                                         <div className="space-y-4">
