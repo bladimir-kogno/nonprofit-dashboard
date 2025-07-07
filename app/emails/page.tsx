@@ -186,48 +186,124 @@ export default function EmailsPage() {
     };
 
     const generateTemplateHTML = (templateData: any) => {
-        const { title, subtitle, imageUrl, quotation, bodyText, ctaText, ctaUrl } = templateData;
+        const { title, subtitle, imageUrl, quotation, bodyText, ctaText, ctaUrl, accentColor } = templateData;
+        const finalAccentColor = accentColor || '#DC4444';
         
         return `
-            <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
-                    <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">${title || 'Newsletter Title'}</h1>
-                    ${subtitle ? `<p style="color: #f0f0f0; margin: 10px 0 0 0; font-size: 16px;">${subtitle}</p>` : ''}
-                </div>
-                
-                ${imageUrl ? `
-                    <div style="text-align: center; margin: 30px 0;">
-                        <img src="${imageUrl}" alt="Newsletter Image" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <div style="max-width: 600px; margin: 0 auto; background: white; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
+                <!-- Header Section -->
+                <div style="text-align: center; padding: 32px 24px;">
+                    <!-- Logo -->
+                    <div style="margin-bottom: 24px;">
+                                                 <div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin-bottom: 16px; background-color: ${finalAccentColor};">
+                             <div style="width: 32px; height: 32px; background: white; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); transform: rotate(180deg);"></div>
+                         </div>
                     </div>
-                ` : ''}
-                
-                <div style="padding: 0 20px;">
-                    ${quotation ? `
-                        <blockquote style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 30px 0; font-style: italic; font-size: 18px;">
-                            "${quotation}"
-                        </blockquote>
-                    ` : ''}
                     
-                    ${bodyText ? `
-                        <div style="margin: 30px 0; font-size: 16px; line-height: 1.8;">
-                            ${bodyText.replace(/\n/g, '</p><p style="margin: 15px 0;">')}
-                        </div>
-                    ` : ''}
+                    <!-- Company Name -->
+                    <div style="font-size: 14px; font-weight: 600; letter-spacing: 2px; color: #6B7280; text-transform: uppercase; margin-bottom: 24px;">
+                        Your Organization
+                    </div>
                     
-                    ${ctaText && ctaUrl ? `
-                        <div style="text-align: center; margin: 40px 0;">
-                            <a href="${ctaUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-                                ${ctaText}
-                            </a>
-                        </div>
-                    ` : ''}
+                    <!-- Main Headline -->
+                    <h1 style="font-size: 32px; font-weight: bold; color: #1F2937; line-height: 1.2; margin: 0 0 16px 0;">
+                        ${title || 'Get All Your Updates In One Spot'}
+                    </h1>
+                    
+                    ${subtitle ? `<p style="font-size: 16px; color: #6B7280; margin: 0;">${subtitle}</p>` : ''}
                 </div>
-                
-                <div style="background-color: #f8f9fa; padding: 30px 20px; text-align: center; margin-top: 40px;">
-                    <p style="margin: 0; color: #666; font-size: 14px;">
-                        Thank you for your continued support!<br>
-                        <strong>Rise for Hope Team</strong>
+
+                <!-- Geometric Design Section -->
+                <div style="position: relative; padding: 48px 24px; overflow: hidden;">
+                    <!-- Background geometric elements -->
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
+                        <!-- Large background circles -->
+                        <div style="position: absolute; width: 128px; height: 128px; background-color: #F3F4F6; border-radius: 50%; opacity: 0.6; top: -32px; left: -32px;"></div>
+                        <div style="position: absolute; width: 96px; height: 96px; background-color: #F3F4F6; border-radius: 50%; opacity: 0.4; top: 64px; right: 48px;"></div>
+                        <div style="position: absolute; width: 80px; height: 80px; background-color: #F3F4F6; border-radius: 50%; opacity: 0.5; bottom: 32px; left: 64px;"></div>
+                        <div style="position: absolute; width: 64px; height: 64px; background-color: #F3F4F6; border-radius: 50%; opacity: 0.3; bottom: 64px; right: 32px;"></div>
+                        
+                        <!-- Decorative lines -->
+                        <div style="position: absolute; width: 96px; height: 2px; background-color: #E5E7EB; top: 80px; left: 80px; transform: rotate(45deg);"></div>
+                        <div style="position: absolute; width: 64px; height: 2px; background-color: #E5E7EB; bottom: 96px; right: 64px; transform: rotate(-45deg);"></div>
+                        
+                        <!-- Small geometric shapes -->
+                        <div style="position: absolute; width: 24px; height: 24px; background-color: #E5E7EB; top: 128px; left: 32px; transform: rotate(45deg);"></div>
+                        <div style="position: absolute; width: 16px; height: 16px; background-color: #E5E7EB; bottom: 128px; right: 80px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
+                    </div>
+                    
+                    <!-- Central hexagon with logo -->
+                    <div style="position: relative; z-index: 10; text-align: center; margin-bottom: 32px;">
+                                                 <div style="display: inline-block; width: 80px; height: 80px; background-color: ${finalAccentColor}; clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                            <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 32px; height: 32px;">
+                                    <div style="background: white; width: 100%; height: 100%;"></div>
+                                    <div style="background: white; width: 100%; height: 100%;"></div>
+                                    <div style="background: white; width: 100%; height: 100%;"></div>
+                                    <div style="background: white; width: 100%; height: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div style="position: relative; z-index: 10; text-align: center;">
+                        ${imageUrl ? `
+                            <div style="text-align: center; margin: 30px 0;">
+                                <img src="${imageUrl}" alt="Newsletter Image" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                            </div>
+                        ` : ''}
+                        
+                        ${quotation ? `
+                                                         <blockquote style="background-color: #F9FAFB; border-left: 4px solid ${finalAccentColor}; padding: 20px; margin: 30px auto; font-style: italic; font-size: 18px; max-width: 400px; text-align: left;">
+                                "${quotation}"
+                            </blockquote>
+                        ` : ''}
+                        
+                        ${bodyText ? `
+                            <p style="color: #6B7280; line-height: 1.6; margin: 32px auto; max-width: 400px; font-size: 16px;">
+                                ${bodyText.replace(/\n/g, '<br>')}
+                            </p>
+                        ` : ''}
+                        
+                        ${ctaText && ctaUrl ? `
+                            <a href="${ctaUrl}" style="display: inline-block; padding: 12px 32px; color: white; font-weight: 500; background-color: #333333; text-decoration: none; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border-radius: 0; margin-top: 16px; transition: box-shadow 0.3s ease;">${ctaText}</a>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- Footer Section -->
+                <div style="text-align: center; padding: 32px 24px; background-color: #F9FAFB;">
+                    <p style="color: #6B7280; margin: 0 0 16px 0; font-weight: 500;">
+                        Kind Regards,
                     </p>
+                    
+                    <div style="font-size: 14px; color: #9CA3AF; line-height: 1.4;">
+                        <p style="margin: 0; font-weight: 500;">©${new Date().getFullYear()} Your Organization,</p>
+                        <p style="margin: 4px 0;">123 Nonprofit Street, City, State 12345</p>
+                        <p style="margin: 4px 0;">United States</p>
+                        <p style="margin: 16px 0 0 0;">All rights reserved.</p>
+                    </div>
+
+                    <!-- Social Links Placeholder -->
+                    <div style="display: flex; justify-content: center; gap: 24px; margin: 24px 0;">
+                        <div style="width: 32px; height: 32px; background-color: #D1D5DB; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 16px; height: 16px; background-color: #9CA3AF; border-radius: 50%;"></div>
+                        </div>
+                        <div style="width: 32px; height: 32px; background-color: #D1D5DB; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 16px; height: 16px; background-color: #9CA3AF; border-radius: 50%;"></div>
+                        </div>
+                        <div style="width: 32px; height: 32px; background-color: #D1D5DB; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 16px; height: 16px; background-color: #9CA3AF; border-radius: 50%;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer links -->
+                    <div style="display: flex; justify-content: center; gap: 24px; font-size: 14px; color: #9CA3AF;">
+                        <a href="#" style="color: #9CA3AF; text-decoration: none;">Our Blog</a>
+                        <a href="#" style="color: #9CA3AF; text-decoration: none;">Unsubscribe</a>
+                        <a href="#" style="color: #9CA3AF; text-decoration: none;">Policies</a>
+                    </div>
                 </div>
             </div>
         `;
@@ -1035,6 +1111,33 @@ export default function EmailsPage() {
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Brand Color
+                                                </label>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="color"
+                                                        value={formData.templateData?.accentColor || '#DC4444'}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData, 
+                                                            templateData: {...formData.templateData, accentColor: e.target.value}
+                                                        })}
+                                                        className="w-16 h-10 border border-gray-300 rounded cursor-pointer"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        placeholder="#DC4444"
+                                                        value={formData.templateData?.accentColor || '#DC4444'}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData, 
+                                                            templateData: {...formData.templateData, accentColor: e.target.value}
+                                                        })}
+                                                        className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    />
+                                                </div>
+                                                <p className="text-xs text-gray-500 mt-1">Choose your organization's primary color for the template</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
                                                     Header Image URL
                                                 </label>
                                                 <input
@@ -1398,64 +1501,161 @@ export default function EmailsPage() {
                 isOpen={showSendModal}
                 onClose={() => setShowSendModal(false)}
                 title={sendingNewsletter ? `Send Newsletter: ${sendingNewsletter.title}` : 'Send Newsletter'}
+                size="lg"
             >
                 <div className="space-y-6">
-                    <div className="text-center">
-                        <p className="text-gray-600 mb-4">
-                            Choose when to send this newsletter to your recipients.
-                        </p>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button
-                            onClick={handleSendNow}
-                            disabled={sending}
-                            className="p-6 border-2 border-green-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <div className="text-center">
-                                <Send className="h-8 w-8 text-green-600 mx-auto mb-3" />
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Send Now</h3>
-                                <p className="text-sm text-gray-600">
-                                    Send immediately to all recipients
-                                </p>
-                            </div>
-                        </button>
+                    {/* Newsletter Preview Section */}
+                    {sendingNewsletter && (
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <h4 className="font-semibold text-gray-900 mb-2">{sendingNewsletter.title}</h4>
+                            <p className="text-sm text-gray-600 mb-2">
+                                <span className="font-medium">Subject:</span> {sendingNewsletter.subject}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                                {sendingNewsletter.content ? sendingNewsletter.content.substring(0, 150) + '...' : 'No content preview available'}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Recipient Selection Section */}
+                    <div className="border border-orange-200 bg-orange-50 p-4 rounded-lg">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Users className="h-5 w-5 text-orange-600" />
+                            <h3 className="font-semibold text-gray-900">Who will receive this newsletter?</h3>
+                        </div>
                         
-                        <div className="p-6 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                            <div className="text-center mb-4">
-                                <Calendar className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Send Later</h3>
-                                <p className="text-sm text-gray-600 mb-4">
-                                    Schedule for a specific date and time
-                                </p>
+                        <div className="space-y-3">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Select Contact List
+                                </label>
+                                <select
+                                    value={sendingNewsletter?.recipientList || 'All Contacts'}
+                                    onChange={(e) => {
+                                        if (sendingNewsletter) {
+                                            // Update the newsletter's recipient list
+                                            setNewsletters(newsletters.map(n => 
+                                                n.id === sendingNewsletter.id 
+                                                    ? { ...n, recipientList: e.target.value }
+                                                    : n
+                                            ));
+                                            setSendingNewsletter({ ...sendingNewsletter, recipientList: e.target.value });
+                                        }
+                                    }}
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"
+                                >
+                                    <option value="All Contacts">All Contacts</option>
+                                    <option value="All Donors">All Donors</option>
+                                    <option value="All Volunteers">All Volunteers</option>
+                                    <option value="Active Volunteers">Active Volunteers</option>
+                                    <option value="Individual Donors">Individual Donors</option>
+                                    <option value="Corporate Donors">Corporate Donors</option>
+                                    <option value="Foundation Donors">Foundation Donors</option>
+                                    <option value="Monthly Donors">Monthly Donors</option>
+                                </select>
                             </div>
                             
-                            <div className="space-y-3">
-                                <div>
-                                    <input
-                                        type="date"
-                                        value={sendLaterData.date}
-                                        onChange={(e) => setSendLaterData({...sendLaterData, date: e.target.value})}
-                                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        min={new Date().toISOString().split('T')[0]}
-                                    />
+                            {/* Estimated Recipients Count */}
+                            <div className="bg-white p-3 rounded border border-orange-200">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-gray-700">Estimated Recipients:</span>
+                                    <span className="text-lg font-bold text-orange-600">
+                                        {(() => {
+                                            const listName = sendingNewsletter?.recipientList || 'All Contacts';
+                                            switch (listName) {
+                                                case 'All Donors': return '45';
+                                                case 'All Volunteers': return '23';
+                                                case 'Active Volunteers': return '18';
+                                                case 'Individual Donors': return '38';
+                                                case 'Corporate Donors': return '7';
+                                                case 'Foundation Donors': return '3';
+                                                case 'Monthly Donors': return '22';
+                                                default: return '78'; // All Contacts
+                                            }
+                                        })()}
+                                    </span>
                                 </div>
-                                <div>
-                                    <input
-                                        type="time"
-                                        value={sendLaterData.time}
-                                        onChange={(e) => setSendLaterData({...sendLaterData, time: e.target.value})}
-                                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                </div>
-                                <button
-                                    onClick={handleSendLater}
-                                    disabled={!sendLaterData.date || !sendLaterData.time}
-                                    className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Schedule Send
-                                </button>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    This is an estimate based on your current contact lists
+                                </p>
                             </div>
+                        </div>
+                    </div>
+                    
+                    {/* Send Options */}
+                    <div className="space-y-4">
+                        <h3 className="font-semibold text-gray-900 text-center">Choose when to send</h3>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <button
+                                onClick={handleSendNow}
+                                disabled={sending}
+                                className="p-6 border-2 border-green-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <div className="text-center">
+                                    <Send className="h-8 w-8 text-green-600 mx-auto mb-3" />
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Send Now</h3>
+                                    <p className="text-sm text-gray-600">
+                                        Send immediately to selected recipients
+                                    </p>
+                                </div>
+                            </button>
+                            
+                            <div className="p-6 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                                <div className="text-center mb-4">
+                                    <Calendar className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Send Later</h3>
+                                    <p className="text-sm text-gray-600 mb-4">
+                                        Schedule for a specific date and time
+                                    </p>
+                                </div>
+                                
+                                <div className="space-y-3">
+                                    <div>
+                                        <input
+                                            type="date"
+                                            value={sendLaterData.date}
+                                            onChange={(e) => setSendLaterData({...sendLaterData, date: e.target.value})}
+                                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            min={new Date().toISOString().split('T')[0]}
+                                        />
+                                    </div>
+                                    <div>
+                                        <input
+                                            type="time"
+                                            value={sendLaterData.time}
+                                            onChange={(e) => setSendLaterData({...sendLaterData, time: e.target.value})}
+                                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={handleSendLater}
+                                        disabled={!sendLaterData.date || !sendLaterData.time}
+                                        className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Schedule Send
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Send Sample Button */}
+                    <div className="border-t border-gray-200 pt-4">
+                        <div className="flex justify-center">
+                            <button
+                                onClick={() => {
+                                    if (sendingNewsletter) {
+                                        setCurrentNewsletter(sendingNewsletter);
+                                        setShowSampleModal(true);
+                                        setShowSendModal(false);
+                                    }
+                                }}
+                                className="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-200 transition-colors text-sm"
+                            >
+                                <Eye className="h-4 w-4" />
+                                Send Test Email First
+                            </button>
                         </div>
                     </div>
                     
@@ -1466,9 +1666,9 @@ export default function EmailsPage() {
                         >
                             Cancel
                         </button>
-                                         </div>
-                 </div>
-             </Modal>
+                    </div>
+                </div>
+            </Modal>
 
             {/* Sample Newsletter Modal */}
             <Modal
