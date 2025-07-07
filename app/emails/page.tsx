@@ -26,6 +26,17 @@ interface Newsletter {
     scheduledFor?: string;
     scheduledDate?: string;
     scheduledTime?: string;
+    recipientList?: string;
+    useTemplate?: boolean;
+    templateData?: {
+        title?: string;
+        subtitle?: string;
+        imageUrl?: string;
+        quotation?: string;
+        bodyText?: string;
+        ctaText?: string;
+        ctaUrl?: string;
+    };
 }
 
 interface AutomatedEmail {
@@ -53,7 +64,8 @@ export default function EmailsPage() {
             htmlContent: '<h1>Summer Updates & Upcoming Events</h1><p>Summer has been busy for us with amazing community outreach projects and successful fundraising events. We\'ve reached over 500 families this month with our food assistance program, and our youth mentorship program has expanded to include 50 new participants.</p><h2>Upcoming Events</h2><ul><li>Community BBQ - August 15th</li><li>Volunteer Training - August 20th</li><li>Fundraising Gala - September 10th</li></ul><p>Thank you to all our dedicated volunteers who make this possible!</p>', 
             status: 'Draft', 
             recipients: 0, 
-            created: '2024-07-01' 
+            created: '2024-07-01',
+            recipientList: 'All Contacts'
         },
         { 
             id: 2, 
@@ -63,7 +75,8 @@ export default function EmailsPage() {
             htmlContent: '<h1>Community Impact Report</h1><p>We are proud to share our impact from this past month. With your support, we were able to:</p><ul><li>Provide meals to 300 families</li><li>Offer educational support to 75 children</li><li>Connect 40 individuals with job training opportunities</li></ul><p>Your generosity continues to transform lives in our community.</p>', 
             status: 'Sent', 
             recipients: 156, 
-            created: '2024-06-01' 
+            created: '2024-06-01',
+            recipientList: 'All Donors'
         }
     ]);
 
@@ -138,6 +151,9 @@ export default function EmailsPage() {
     const [showSendModal, setShowSendModal] = useState(false);
     const [sendingNewsletter, setSendingNewsletter] = useState<Newsletter | null>(null);
     const [sendLaterData, setSendLaterData] = useState({ date: '', time: '' });
+    const [showSampleModal, setShowSampleModal] = useState(false);
+    const [sampleEmail, setSampleEmail] = useState('');
+    const [currentNewsletter, setCurrentNewsletter] = useState<Newsletter | null>(null);
 
     // Email sending function
     const sendEmail = async (emailData: any) => {
@@ -169,6 +185,81 @@ export default function EmailsPage() {
         }
     };
 
+    const generateTemplateHTML = (templateData: any) => {
+        const { title, subtitle, imageUrl, quotation, bodyText, ctaText, ctaUrl } = templateData;
+        
+        return `
+            <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">${title || 'Newsletter Title'}</h1>
+                    ${subtitle ? `<p style="color: #f0f0f0; margin: 10px 0 0 0; font-size: 16px;">${subtitle}</p>` : ''}
+                </div>
+                
+                ${imageUrl ? `
+                    <div style="text-align: center; margin: 30px 0;">
+                        <img src="${imageUrl}" alt="Newsletter Image" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                    </div>
+                ` : ''}
+                
+                <div style="padding: 0 20px;">
+                    ${quotation ? `
+                        <blockquote style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 30px 0; font-style: italic; font-size: 18px;">
+                            "${quotation}"
+                        </blockquote>
+                    ` : ''}
+                    
+                    ${bodyText ? `
+                        <div style="margin: 30px 0; font-size: 16px; line-height: 1.8;">
+                            ${bodyText.replace(/\n/g, '</p><p style="margin: 15px 0;">')}
+                        </div>
+                    ` : ''}
+                    
+                    ${ctaText && ctaUrl ? `
+                        <div style="text-align: center; margin: 40px 0;">
+                            <a href="${ctaUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                                ${ctaText}
+                            </a>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <div style="background-color: #f8f9fa; padding: 30px 20px; text-align: center; margin-top: 40px;">
+                    <p style="margin: 0; color: #666; font-size: 14px;">
+                        Thank you for your continued support!<br>
+                        <strong>Rise for Hope Team</strong>
+                    </p>
+                </div>
+            </div>
+        `;
+    };
+
+    const sendSampleNewsletter = async () => {
+        if (!sampleEmail || !currentNewsletter) {
+            alert('Please enter an email address');
+            return;
+        }
+
+        const emailData = {
+            to: sampleEmail,
+            subject: `[SAMPLE] ${currentNewsletter.subject}`,
+            htmlContent: `
+                <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 2px solid #f59e0b;">
+                    <h3 style="color: #92400e; margin: 0;">📧 Sample Newsletter</h3>
+                    <p style="color: #78350f; margin: 5px 0 0 0; font-size: 14px;">This is a preview of your newsletter</p>
+                </div>
+                ${currentNewsletter.htmlContent}
+            `,
+            type: 'sample_newsletter'
+        };
+
+        const success = await sendEmail(emailData);
+        if (success) {
+            setShowSampleModal(false);
+            setSampleEmail('');
+            setCurrentNewsletter(null);
+        }
+    };
+
     const openModal = (type: 'newsletter' | 'template' | 'automation', item: any = null) => {
         setModalType(type);
         setEditingItem(item);
@@ -176,7 +267,26 @@ export default function EmailsPage() {
             setFormData(item);
         } else {
             if (type === 'newsletter') {
-                setFormData({ title: '', subject: '', content: '', htmlContent: '', status: 'Draft', scheduledDate: '', scheduledTime: '' });
+                setFormData({ 
+                    title: '', 
+                    subject: '', 
+                    content: '', 
+                    htmlContent: '', 
+                    status: 'Draft', 
+                    scheduledDate: '', 
+                    scheduledTime: '',
+                    recipientList: 'All Contacts',
+                    useTemplate: false,
+                    templateData: {
+                        title: '',
+                        subtitle: '',
+                        imageUrl: '',
+                        quotation: '',
+                        bodyText: '',
+                        ctaText: '',
+                        ctaUrl: ''
+                    }
+                });
             } else if (type === 'template') {
                 setFormData({ name: '', subject: '', content: '', htmlContent: '', type: 'welcome' });
             } else if (type === 'automation') {
@@ -196,13 +306,21 @@ export default function EmailsPage() {
         e.preventDefault();
         
         if (modalType === 'newsletter') {
+            let processedFormData = { ...formData };
+            
+            // If using template, generate HTML from template data
+            if (formData.useTemplate && formData.templateData) {
+                processedFormData.htmlContent = generateTemplateHTML(formData.templateData);
+                processedFormData.content = `${formData.templateData.title || ''}\n${formData.templateData.subtitle || ''}\n${formData.templateData.bodyText || ''}`.trim();
+            }
+            
             if (editingItem) {
                 setNewsletters(newsletters.map(n => 
-                    n.id === editingItem.id ? { ...n, ...formData } : n
+                    n.id === editingItem.id ? { ...n, ...processedFormData } : n
                 ));
             } else {
                 const newNewsletter: Newsletter = {
-                    ...formData,
+                    ...processedFormData,
                     id: Date.now(),
                     recipients: 0,
                     created: new Date().toISOString().split('T')[0]
@@ -250,12 +368,29 @@ export default function EmailsPage() {
         const newsletter = newsletters.find(n => n.id === newsletterId);
         if (!newsletter) return;
 
-        // Mock recipient emails - in production, get from database
-        const recipients = [
-            'donor1@example.com',
-            'donor2@example.com',
-            'volunteer1@example.com'
-        ];
+        // Mock recipient emails based on selected list - in production, get from database
+        const getRecipientsByList = (listName: string) => {
+            switch (listName) {
+                case 'All Donors':
+                    return ['donor1@example.com', 'donor2@example.com', 'donor3@example.com'];
+                case 'All Volunteers':
+                    return ['volunteer1@example.com', 'volunteer2@example.com'];
+                case 'Active Volunteers':
+                    return ['volunteer1@example.com'];
+                case 'Individual Donors':
+                    return ['donor1@example.com', 'donor2@example.com'];
+                case 'Corporate Donors':
+                    return ['corporate@company.com'];
+                case 'Foundation Donors':
+                    return ['grants@foundation.org'];
+                case 'Monthly Donors':
+                    return ['donor1@example.com'];
+                default: // All Contacts
+                    return ['donor1@example.com', 'donor2@example.com', 'volunteer1@example.com', 'contact1@example.com'];
+            }
+        };
+
+        const recipients = getRecipientsByList(newsletter.recipientList || 'All Contacts');
 
         const emailData = {
             to: recipients,
@@ -530,22 +665,28 @@ export default function EmailsPage() {
                                                     )}
                                                 </button>
                                             )}
-                                            <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                                                <span className="flex items-center gap-1">
-                                                    <Calendar className="h-4 w-4" />
-                                                    Created: {newsletter.created}
-                                                </span>
-                                                <span className="flex items-center gap-1">
-                                                    <Users className="h-4 w-4" />
-                                                    Recipients: {newsletter.recipients}
-                                                </span>
-                                                {newsletter.status === 'Scheduled' && newsletter.scheduledDate && newsletter.scheduledTime && (
-                                                    <span className="flex items-center gap-1">
-                                                        <Calendar className="h-4 w-4" />
-                                                        Scheduled: {newsletter.scheduledDate} at {newsletter.scheduledTime}
-                                                    </span>
-                                                )}
-                                            </div>
+                                                                        <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                                <span className="flex items-center gap-1">
+                                    <Calendar className="h-4 w-4" />
+                                    Created: {newsletter.created}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                    <Users className="h-4 w-4" />
+                                    Recipients: {newsletter.recipients}
+                                </span>
+                                {newsletter.recipientList && (
+                                    <span className="flex items-center gap-1">
+                                        <Mail className="h-4 w-4" />
+                                        List: {newsletter.recipientList}
+                                    </span>
+                                )}
+                                {newsletter.status === 'Scheduled' && newsletter.scheduledDate && newsletter.scheduledTime && (
+                                    <span className="flex items-center gap-1">
+                                        <Calendar className="h-4 w-4" />
+                                        Scheduled: {newsletter.scheduledDate} at {newsletter.scheduledTime}
+                                    </span>
+                                )}
+                            </div>
                                         </div>
                                         <div className="flex flex-col items-end gap-3">
                                             <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(newsletter.status)}`}>
@@ -570,18 +711,31 @@ export default function EmailsPage() {
                                         </div>
                                     </div>
                                 </div>
-                                {newsletter.status === 'Draft' && (
-                                    <div className="px-4 pb-4 pt-0 border-t border-gray-100">
-                                        <button 
-                                            onClick={() => openSendModal(newsletter)}
-                                            disabled={sending}
-                                            className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            <Send className="h-4 w-4" />
-                                            Send Newsletter
-                                        </button>
-                                    </div>
-                                )}
+                                                {newsletter.status === 'Draft' && (
+                    <div className="px-4 pb-4 pt-0 border-t border-gray-100">
+                        <div className="flex flex-wrap gap-2">
+                            <button 
+                                onClick={() => openSendModal(newsletter)}
+                                disabled={sending}
+                                className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <Send className="h-4 w-4" />
+                                Send Newsletter
+                            </button>
+                            <button 
+                                onClick={() => {
+                                    setCurrentNewsletter(newsletter);
+                                    setShowSampleModal(true);
+                                }}
+                                disabled={sending}
+                                className="bg-orange-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                            >
+                                <Mail className="h-4 w-4" />
+                                Send Sample
+                            </button>
+                        </div>
+                    </div>
+                )}
                             </div>
                         ))}
                     </div>
@@ -721,6 +875,7 @@ export default function EmailsPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {modalType === 'newsletter' && (
                         <div className="space-y-6">
+                            {/* Basic Info and Recipients */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 <div className="space-y-4">
                                     <div>
@@ -748,6 +903,25 @@ export default function EmailsPage() {
                                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                             required
                                         />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Recipient List
+                                        </label>
+                                        <select
+                                            value={formData.recipientList || 'All Contacts'}
+                                            onChange={(e) => setFormData({...formData, recipientList: e.target.value})}
+                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        >
+                                            <option value="All Contacts">All Contacts</option>
+                                            <option value="All Donors">All Donors</option>
+                                            <option value="All Volunteers">All Volunteers</option>
+                                            <option value="Active Volunteers">Active Volunteers</option>
+                                            <option value="Individual Donors">Individual Donors</option>
+                                            <option value="Corporate Donors">Corporate Donors</option>
+                                            <option value="Foundation Donors">Foundation Donors</option>
+                                            <option value="Monthly Donors">Monthly Donors</option>
+                                        </select>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -791,17 +965,155 @@ export default function EmailsPage() {
                                         </div>
                                     )}
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Newsletter Content
-                                    </label>
-                                    <HTMLEditor
-                                        content={formData.htmlContent || ''}
-                                        onChange={(html) => setFormData({...formData, htmlContent: html, content: html.replace(/<[^>]*>/g, '')})}
-                                        placeholder="Write your newsletter content here..."
-                                    />
+                                <div className="space-y-4">
+                                    {/* Template Toggle */}
+                                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                        <label className="flex items-center gap-3 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.useTemplate || false}
+                                                onChange={(e) => setFormData({...formData, useTemplate: e.target.checked})}
+                                                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <div>
+                                                <span className="text-sm font-medium text-gray-900">Use Template Builder</span>
+                                                <p className="text-xs text-gray-500">Create a structured newsletter with predefined sections</p>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    {!formData.useTemplate && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Newsletter Content
+                                            </label>
+                                            <HTMLEditor
+                                                content={formData.htmlContent || ''}
+                                                onChange={(html) => setFormData({...formData, htmlContent: html, content: html.replace(/<[^>]*>/g, '')})}
+                                                placeholder="Write your newsletter content here..."
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
+
+                            {/* Template Builder */}
+                            {formData.useTemplate && (
+                                <div className="border-t border-gray-200 pt-6">
+                                    <h4 className="text-lg font-medium text-gray-900 mb-4">Newsletter Template Builder</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Main Title
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Newsletter main title"
+                                                    value={formData.templateData?.title || ''}
+                                                    onChange={(e) => setFormData({
+                                                        ...formData, 
+                                                        templateData: {...formData.templateData, title: e.target.value}
+                                                    })}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Subtitle
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Newsletter subtitle (optional)"
+                                                    value={formData.templateData?.subtitle || ''}
+                                                    onChange={(e) => setFormData({
+                                                        ...formData, 
+                                                        templateData: {...formData.templateData, subtitle: e.target.value}
+                                                    })}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Header Image URL
+                                                </label>
+                                                <input
+                                                    type="url"
+                                                    placeholder="https://example.com/image.jpg"
+                                                    value={formData.templateData?.imageUrl || ''}
+                                                    onChange={(e) => setFormData({
+                                                        ...formData, 
+                                                        templateData: {...formData.templateData, imageUrl: e.target.value}
+                                                    })}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Featured Quote
+                                                </label>
+                                                <textarea
+                                                    placeholder="Add an inspiring quote or message"
+                                                    value={formData.templateData?.quotation || ''}
+                                                    onChange={(e) => setFormData({
+                                                        ...formData, 
+                                                        templateData: {...formData.templateData, quotation: e.target.value}
+                                                    })}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    rows={3}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Main Content
+                                                </label>
+                                                <textarea
+                                                    placeholder="Write your main newsletter content here..."
+                                                    value={formData.templateData?.bodyText || ''}
+                                                    onChange={(e) => setFormData({
+                                                        ...formData, 
+                                                        templateData: {...formData.templateData, bodyText: e.target.value}
+                                                    })}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    rows={8}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Call-to-Action Button Text
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="e.g., Donate Now, Learn More"
+                                                    value={formData.templateData?.ctaText || ''}
+                                                    onChange={(e) => setFormData({
+                                                        ...formData, 
+                                                        templateData: {...formData.templateData, ctaText: e.target.value}
+                                                    })}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Call-to-Action URL
+                                                </label>
+                                                <input
+                                                    type="url"
+                                                    placeholder="https://your-website.com/action"
+                                                    value={formData.templateData?.ctaUrl || ''}
+                                                    onChange={(e) => setFormData({
+                                                        ...formData, 
+                                                        templateData: {...formData.templateData, ctaUrl: e.target.value}
+                                                    })}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -987,6 +1299,29 @@ export default function EmailsPage() {
                         >
                             {sending ? 'Processing...' : (editingItem ? 'Update' : 'Create')}
                         </button>
+                        {modalType === 'newsletter' && formData.useTemplate && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const previewHTML = generateTemplateHTML(formData.templateData || {});
+                                    const newWindow = window.open();
+                                    if (newWindow) {
+                                        newWindow.document.write(`
+                                            <html>
+                                                <head><title>Newsletter Preview</title></head>
+                                                <body style="margin: 0; padding: 20px; background-color: #f5f5f5;">
+                                                    ${previewHTML}
+                                                </body>
+                                            </html>
+                                        `);
+                                        newWindow.document.close();
+                                    }
+                                }}
+                                className="py-3 px-6 rounded-lg border border-blue-300 text-blue-700 hover:bg-blue-50 transition-colors"
+                            >
+                                Preview
+                            </button>
+                        )}
                         <button
                             type="button"
                             onClick={closeModal}
@@ -1128,6 +1463,55 @@ export default function EmailsPage() {
                         <button
                             onClick={() => setShowSendModal(false)}
                             className="py-2 px-6 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                                         </div>
+                 </div>
+             </Modal>
+
+            {/* Sample Newsletter Modal */}
+            <Modal
+                isOpen={showSampleModal}
+                onClose={() => setShowSampleModal(false)}
+                title="Send Sample Newsletter"
+            >
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Recipient Email Address
+                        </label>
+                        <input
+                            type="email"
+                            placeholder="Enter email address to test"
+                            value={sampleEmail}
+                            onChange={(e) => setSampleEmail(e.target.value)}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            required
+                        />
+                    </div>
+                    
+                    {currentNewsletter && (
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <h4 className="font-medium text-gray-900 mb-2">{currentNewsletter.title}</h4>
+                            <p className="text-sm text-gray-600 mb-2">Subject: {currentNewsletter.subject}</p>
+                            <p className="text-sm text-gray-500">
+                                Recipient List: {currentNewsletter.recipientList || 'All Contacts'}
+                            </p>
+                        </div>
+                    )}
+                    
+                    <div className="flex gap-3 pt-4">
+                        <button
+                            onClick={sendSampleNewsletter}
+                            disabled={sending}
+                            className="flex-1 py-2 px-4 rounded-lg text-white font-medium bg-orange-600 hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {sending ? 'Sending...' : 'Send Sample'}
+                        </button>
+                        <button
+                            onClick={() => setShowSampleModal(false)}
+                            className="flex-1 py-2 px-4 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
                             Cancel
                         </button>
