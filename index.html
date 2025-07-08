@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Lesson Plan Extractor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .upload-section {
+            background: #f8f9ff;
+            border: 2px dashed #4facfe;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-section:hover {
+            background: #f0f4ff;
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .upload-section.dragover {
+            background: #e0f2fe;
+            border-color: #0277bd;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            color: #4facfe;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .upload-subtext {
+            color: #666;
+            font-size: 1em;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e7ff;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .lesson-plan {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            display: none;
+        }
+
+        .lesson-plan h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 2em;
+            text-align: center;
+            border-bottom: 2px solid #4facfe;
+            padding-bottom: 10px;
+        }
+
+        .lesson-field {
+            margin-bottom: 25px;
+        }
+
+        .lesson-field label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .lesson-field input,
+        .lesson-field textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .lesson-field input:focus,
+        .lesson-field textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .lesson-field textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .resources-list {
+            background: #f8f9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 8px;
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .resource-item input {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .remove-resource {
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .add-resource {
+            background: #2ed573;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .export-section {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .processing {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 PDF Lesson Plan Extractor</h1>
+            <p>Transform your PDF documents into structured lesson plans with AI-powered extraction</p>
+        </div>
+
+        <div class="main-content">
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Drop your PDF file here or click to browse</div>
+                <div class="upload-subtext">Supports PDF files up to 10MB</div>
+                <input type="file" id="fileInput" class="file-input" accept=".pdf">
+                <button class="btn" onclick="document.getElementById('fileInput').click()">
+                    Choose PDF File
+                </button>
+            </div>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="status" id="status"></div>
+
+            <div class="lesson-plan" id="lessonPlan">
+                <h2>Generated Lesson Plan</h2>
+                
+                <div class="lesson-field">
+                    <label>Unit Name</label>
+                    <input type="text" id="unitName" placeholder="Enter unit name">
+                </div>
+
+                <div class="lesson-field">
+                    <label>Learning Objectives</label>
+                    <textarea id="objectives" placeholder="Students will be able to..."></textarea>
+                </div>
+
+                <div class="lesson-field">
+                    <label>Content Overview</label>
+                    <textarea id="contentOverview" placeholder="Covers core concepts in..."></textarea>
+                </div>
+
+                <div class="lesson-field">
+                    <label>Teaching Methods</label>
+                    <textarea id="teachingMethods" placeholder="Direct instruction, group discussion..."></textarea>
+                </div>
+
+                <div class="lesson-field">
+                    <label>Learning Activities</label>
+                    <textarea id="learningActivities" placeholder="Hands-on exercises, Q&A..."></textarea>
+                </div>
+
+                <div class="lesson-field">
+                    <label>Homework</label>
+                    <textarea id="homework" placeholder="Complete worksheet A..."></textarea>
+                </div>
+
+                <div class="lesson-field">
+                    <label>Assessment Plan</label>
+                    <textarea id="assessmentPlan" placeholder="Formative quiz at end..."></textarea>
+                </div>
+
+                <div class="lesson-field">
+                    <label>Differentiation</label>
+                    <textarea id="differentiation" placeholder="Pair work for advanced learners..."></textarea>
+                </div>
+
+                <div class="lesson-field">
+                    <label>Progression</label>
+                    <textarea id="progression" placeholder="Builds on prior unit on..."></textarea>
+                </div>
+
+                <div class="lesson-field">
+                    <label>Resources</label>
+                    <div class="resources-list" id="resourcesList">
+                        <div class="resource-item">
+                            <input type="text" placeholder="Enter resource name" value="Textbook">
+                            <button class="remove-resource" onclick="removeResource(this)">×</button>
+                        </div>
+                        <div class="resource-item">
+                            <input type="text" placeholder="Enter resource name" value="Whiteboard">
+                            <button class="remove-resource" onclick="removeResource(this)">×</button>
+                        </div>
+                        <div class="resource-item">
+                            <input type="text" placeholder="Enter resource name" value="Worksheet A">
+                            <button class="remove-resource" onclick="removeResource(this)">×</button>
+                        </div>
+                    </div>
+                    <button class="add-resource" onclick="addResource()">+ Add Resource</button>
+                </div>
+
+                <div class="export-section">
+                    <button class="btn" onclick="exportAsJSON()">💾 Export as JSON</button>
+                    <button class="btn" onclick="exportAsText()">📝 Export as Text</button>
+                    <button class="btn" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInput = document.getElementById('fileInput');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const status = document.getElementById('status');
+        const lessonPlan = document.getElementById('lessonPlan');
+
+        // Drag and drop functionality
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function showStatus(message, type = 'info') {
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+
+        function updateProgress(percent) {
+            progressBar.style.display = 'block';
+            progressFill.style.width = percent + '%';
+        }
+
+        function hideProgress() {
+            progressBar.style.display = 'none';
+        }
+
+        async function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                showStatus('Please select a PDF file.', 'error');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showStatus('File size must be less than 10MB.', 'error');
+                return;
+            }
+
+            showStatus('Processing PDF file...', 'info');
+            updateProgress(20);
+
+            try {
+                const text = await extractTextFromPDF(file);
+                updateProgress(60);
+                
+                const lessonPlanData = generateLessonPlan(text);
+                updateProgress(80);
+                
+                populateLessonPlan(lessonPlanData);
+                updateProgress(100);
+                
+                showStatus('Lesson plan generated successfully!', 'success');
+                lessonPlan.style.display = 'block';
+                
+                setTimeout(hideProgress, 1000);
+            } catch (error) {
+                showStatus('Error processing PDF: ' + error.message, 'error');
+                hideProgress();
+            }
+        }
+
+        async function extractTextFromPDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = '';
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                fullText += pageText + '\n';
+            }
+
+            return fullText;
+        }
+
+        function generateLessonPlan(text) {
+            // AI-powered content extraction simulation
+            // In a real implementation, this would use OpenAI API or similar
+            
+            const keywords = extractKeywords(text);
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
+            
+            return {
+                unitName: extractUnitName(text, keywords),
+                objectives: extractObjectives(text, sentences),
+                contentOverview: extractContentOverview(text, keywords),
+                teachingMethods: extractTeachingMethods(text, sentences),
+                learningActivities: extractLearningActivities(text, sentences),
+                homework: extractHomework(text, sentences),
+                assessmentPlan: extractAssessmentPlan(text, sentences),
+                differentiation: extractDifferentiation(text, sentences),
+                progression: extractProgression(text, sentences),
+                resources: extractResources(text, sentences)
+            };
+        }
+
+        function extractKeywords(text) {
+            const commonWords = new Set(['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those']);
+            
+            return text.toLowerCase()
+                .replace(/[^\w\s]/g, '')
+                .split(/\s+/)
+                .filter(word => word.length > 3 && !commonWords.has(word))
+                .reduce((acc, word) => {
+                    acc[word] = (acc[word] || 0) + 1;
+                    return acc;
+                }, {});
+        }
+
+        function extractUnitName(text, keywords) {
+            const titlePatterns = [
+                /(?:unit|chapter|lesson|topic)[\s\d]*:?\s*([^.\n]+)/i,
+                /^([^.\n]{10,50})/,
+                /title:\s*([^.\n]+)/i
+            ];
+
+            for (const pattern of titlePatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    return match[1].trim();
+                }
+            }
+
+            const topKeywords = Object.entries(keywords)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([word]) => word);
+
+            return topKeywords.join(' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Sample Unit';
+        }
+
+        function extractObjectives(text, sentences) {
+            const objectivePatterns = [
+                /(?:students will|learners will|objectives?|goals?|aims?)[\s\w]*:?\s*([^.\n]+)/i,
+                /by the end.*students.*will.*([^.\n]+)/i,
+                /after.*lesson.*students.*([^.\n]+)/i
+            ];
+
+            for (const pattern of objectivePatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    return "Students will be able to " + match[1].trim().toLowerCase();
+                }
+            }
+
+            const relevantSentences = sentences.filter(s => 
+                /\b(learn|understand|identify|explain|demonstrate|analyze|apply|create)\b/i.test(s)
+            );
+
+            return relevantSentences.length > 0 ? 
+                "Students will be able to " + relevantSentences[0].trim().toLowerCase() : 
+                "Students will be able to understand the key concepts presented in this unit.";
+        }
+
+        function extractContentOverview(text, keywords) {
+            const overviewPatterns = [
+                /(?:overview|introduction|summary|about)[\s\w]*:?\s*([^.\n]+)/i,
+                /this.*(?:covers|includes|focuses|discusses).*([^.\n]+)/i
+            ];
+
+            for (const pattern of overviewPatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    return match[1].trim();
+                }
+            }
+
+            const topKeywords = Object.entries(keywords)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(([word]) => word);
+
+            return `Covers core concepts in ${topKeywords.join(', ')} and related topics.`;
+        }
+
+        function extractTeachingMethods(text, sentences) {
+            const methodKeywords = ['lecture', 'discussion', 'demonstration', 'presentation', 'instruction', 'explanation', 'group work', 'collaboration'];
+            
+            const methodSentences = sentences.filter(s => 
+                methodKeywords.some(keyword => s.toLowerCase().includes(keyword))
+            );
+
+            if (methodSentences.length > 0) {
+                return methodSentences[0].trim();
+            }
+
+            return "Direct instruction, interactive discussion, and guided practice activities.";
+        }
+
+        function extractLearningActivities(text, sentences) {
+            const activityKeywords = ['activity', 'exercise', 'practice', 'assignment', 'task', 'project', 'workshop', 'lab'];
+            
+            const activitySentences = sentences.filter(s => 
+                activityKeywords.some(keyword => s.toLowerCase().includes(keyword))
+            );
+
+            if (activitySentences.length > 0) {
+                return activitySentences.slice(0, 2).join('. ').trim();
+            }
+
+            return "Hands-on exercises, interactive Q&A sessions, and collaborative problem-solving activities.";
+        }
+
+        function extractHomework(text, sentences) {
+            const homeworkPatterns = [
+                /(?:homework|assignment|task|exercise)[\s\w]*:?\s*([^.\n]+)/i,
+                /complete.*([^.\n]+)/i,
+                /for next class.*([^.\n]+)/i
+            ];
+
+            for (const pattern of homeworkPatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    return match[1].trim();
+                }
+            }
+
+            return "Complete the assigned readings and practice exercises for reinforcement.";
+        }
+
+        function extractAssessmentPlan(text, sentences) {
+            const assessmentKeywords = ['quiz', 'test', 'assessment', 'evaluation', 'exam', 'check', 'review'];
+            
+            const assessmentSentences = sentences.filter(s => 
+                assessmentKeywords.some(keyword => s.toLowerCase().includes(keyword))
+            );
+
+            if (assessmentSentences.length > 0) {
+                return assessmentSentences[0].trim();
+            }
+
+            return "Formative assessment through class participation and end-of-lesson comprehension check.";
+        }
+
+        function extractDifferentiation(text, sentences) {
+            const differentiationKeywords = ['advanced', 'beginner', 'different', 'level', 'pair', 'group', 'individual', 'support'];
+            
+            const diffSentences = sentences.filter(s => 
+                differentiationKeywords.some(keyword => s.toLowerCase().includes(keyword))
+            );
+
+            if (diffSentences.length > 0) {
+                return diffSentences[0].trim();
+            }
+
+            return "Pair work for advanced learners, additional support materials for struggling students.";
+        }
+
+        function extractProgression(text, sentences) {
+            const progressionKeywords = ['previous', 'prior', 'builds', 'foundation', 'follows', 'continues', 'sequence'];
+            
+            const progressionSentences = sentences.filter(s => 
+                progressionKeywords.some(keyword => s.toLowerCase().includes(keyword))
+            );
+
+            if (progressionSentences.length > 0) {
+                return progressionSentences[0].trim();
+            }
+
+            return "Builds on foundational concepts from previous units and prepares for advanced topics.";
+        }
+
+        function extractResources(text, sentences) {
+            const resourceKeywords = ['book', 'textbook', 'worksheet', 'handout', 'material', 'resource', 'tool', 'equipment'];
+            
+            const foundResources = [];
+            resourceKeywords.forEach(keyword => {
+                const regex = new RegExp(`\\b${keyword}\\w*\\b`, 'gi');
+                const matches = text.match(regex);
+                if (matches) {
+                    foundResources.push(...matches.map(m => m.charAt(0).toUpperCase() + m.slice(1).toLowerCase()));
+                }
+            });
+
+            const uniqueResources = [...new Set(foundResources)].slice(0, 5);
+            
+            return uniqueResources.length > 0 ? 
+                uniqueResources : 
+                ['Textbook', 'Whiteboard', 'Handouts', 'Digital Resources'];
+        }
+
+        function populateLessonPlan(data) {
+            document.getElementById('unitName').value = data.unitName;
+            document.getElementById('objectives').value = data.objectives;
+            document.getElementById('contentOverview').value = data.contentOverview;
+            document.getElementById('teachingMethods').value = data.teachingMethods;
+            document.getElementById('learningActivities').value = data.learningActivities;
+            document.getElementById('homework').value = data.homework;
+            document.getElementById('assessmentPlan').value = data.assessmentPlan;
+            document.getElementById('differentiation').value = data.differentiation;
+            document.getElementById('progression').value = data.progression;
+            
+            // Clear existing resources and add new ones
+            const resourcesList = document.getElementById('resourcesList');
+            resourcesList.innerHTML = '';
+            
+            data.resources.forEach(resource => {
+                addResourceItem(resource);
+            });
+        }
+
+        function addResource() {
+            addResourceItem('');
+        }
+
+        function addResourceItem(value = '') {
+            const resourcesList = document.getElementById('resourcesList');
+            const resourceItem = document.createElement('div');
+            resourceItem.className = 'resource-item';
+            resourceItem.innerHTML = `
+                <input type="text" placeholder="Enter resource name" value="${value}">
+                <button class="remove-resource" onclick="removeResource(this)">×</button>
+            `;
+            resourcesList.appendChild(resourceItem);
+        }
+
+        function removeResource(button) {
+            button.parentElement.remove();
+        }
+
+        function exportAsJSON() {
+            const lessonPlanData = {
+                unitName: document.getElementById('unitName').value,
+                objectives: document.getElementById('objectives').value,
+                contentOverview: document.getElementById('contentOverview').value,
+                teachingMethods: document.getElementById('teachingMethods').value,
+                learningActivities: document.getElementById('learningActivities').value,
+                homework: document.getElementById('homework').value,
+                assessmentPlan: document.getElementById('assessmentPlan').value,
+                differentiation: document.getElementById('differentiation').value,
+                progression: document.getElementById('progression').value,
+                resources: Array.from(document.querySelectorAll('.resource-item input')).map(input => input.value).filter(v => v)
+            };
+
+            const blob = new Blob([JSON.stringify(lessonPlanData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lesson-plan-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportAsText() {
+            const lessonPlanData = {
+                unitName: document.getElementById('unitName').value,
+                objectives: document.getElementById('objectives').value,
+                contentOverview: document.getElementById('contentOverview').value,
+                teachingMethods: document.getElementById('teachingMethods').value,
+                learningActivities: document.getElementById('learningActivities').value,
+                homework: document.getElementById('homework').value,
+                assessmentPlan: document.getElementById('assessmentPlan').value,
+                differentiation: document.getElementById('differentiation').value,
+                progression: document.getElementById('progression').value,
+                resources: Array.from(document.querySelectorAll('.resource-item input')).map(input => input.value).filter(v => v)
+            };
+
+            const textContent = `LESSON PLAN
+=============
+
+Unit Name: ${lessonPlanData.unitName}
+
+Learning Objectives:
+${lessonPlanData.objectives}
+
+Content Overview:
+${lessonPlanData.contentOverview}
+
+Teaching Methods:
+${lessonPlanData.teachingMethods}
+
+Learning Activities:
+${lessonPlanData.learningActivities}
+
+Homework:
+${lessonPlanData.homework}
+
+Assessment Plan:
+${lessonPlanData.assessmentPlan}
+
+Differentiation:
+${lessonPlanData.differentiation}
+
+Progression:
+${lessonPlanData.progression}
+
+Resources:
+${lessonPlanData.resources.map(r => `• ${r}`).join('\n')}`;
+
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lesson-plan-${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function copyToClipboard() {
+            const lessonPlanData = {
+                unitName: document.getElementById('unitName').value,
+                objectives: document.getElementById('objectives').value,
+                contentOverview: document.getElementById('contentOverview').value,
+                teachingMethods: document.getElementById('teachingMethods').value,
+                learningActivities: document.getElementById('learningActivities').value,
+                homework: document.getElementById('homework').value,
+                assessmentPlan: document.getElementById('assessmentPlan').value,
+                differentiation: document.getElementById('differentiation').value,
+                progression: document.getElementById('progression').value,
+                resources: Array.from(document.querySelectorAll('.resource-item input')).map(input => input.value).filter(v => v)
+            };
+
+            navigator.clipboard.writeText(JSON.stringify(lessonPlanData, null, 2)).then(() => {
+                showStatus('Lesson plan copied to clipboard!', 'success');
+            }).catch(() => {
+                showStatus('Failed to copy to clipboard', 'error');
+            });
+        }
+    </script>
+</body>
+</html>
