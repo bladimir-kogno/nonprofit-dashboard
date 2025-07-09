@@ -26,7 +26,7 @@ let clientApp: FirebaseApp | null = null;
 let clientAuth: Auth | null = null;
 let clientDb: Firestore | null = null;
 
-export function getFirebaseClient() {
+export function getFirebaseClient(): { app: FirebaseApp, auth: Auth, db: Firestore } {
   if (typeof window === 'undefined') {
     throw new Error('getFirebaseClient() should only be called in the browser');
   }
@@ -54,7 +54,7 @@ import { getFirestore as getAdminFirestore, Firestore as AdminFirestore } from '
 let adminApp: AdminApp | null = null;
 let adminDb: AdminFirestore | null = null;
 
-export function getFirebaseAdmin() {
+export function getFirebaseAdmin(): { app: AdminApp, db: AdminFirestore } {
   if (!adminApp) {
     const existingApps = getAdminApps();
     if (existingApps.length) {
