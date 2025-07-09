@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "test-build": "next build && next start",
-    "export": "next export",
-    "firebase-deploy": "next build && next export && firebase deploy"
-  },
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint",
+  "test-build": "next build && next start",
+  "export": "next export",
+  "firebase-deploy": "next build && next export && firebase deploy"
+},
   "dependencies": {
     "@clerk/nextjs": "^4.29.12",
     "@supabase/supabase-js": "^2.50.3",
