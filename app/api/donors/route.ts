@@ -1,17 +1,16 @@
 // app/api/donors/route.ts
 
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/db';
 import { donorSchema } from '@/lib/validators';
+import { getFirebaseAdmin } from '@/lib/firebase';
+import { getFirestore } from 'firebase-admin/firestore';
 
 export async function GET() {
-    const { data, error } = await supabase.from('donors').select('*');
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
+    const { app } = getFirebaseAdmin();
+    const db = getFirestore(app);
+    const snapshot = await db.collection('donors').get();
+    const donors = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return NextResponse.json(donors);
 }
 
 export async function POST(request: Request) {
@@ -22,11 +21,13 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
-    const { data, error } = await supabase.from('donors').insert([body]);
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data, { status: 201 });
+    const { app } = getFirebaseAdmin();
+    const db = getFirestore(app);
+    const docRef = await db.collection('donors').add({
+        ...body,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+    });
+    const newDonor = { id: docRef.id, ...body };
+    return NextResponse.json(newDonor, { status: 201 });
 }

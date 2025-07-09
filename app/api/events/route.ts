@@ -1,17 +1,16 @@
 // app/api/events/route.ts
 
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/db';
 import { eventSchema } from '@/lib/validators';
+import { getFirebaseAdmin } from '@/lib/firebase';
+import { getFirestore } from 'firebase-admin/firestore';
 
 export async function GET() {
-    const { data, error } = await supabase.from('events').select('*');
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
+    const { app } = getFirebaseAdmin();
+    const db = getFirestore(app);
+    const snapshot = await db.collection('events').get();
+    const events = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return NextResponse.json(events);
 }
 
 export async function POST(request: Request) {
@@ -22,11 +21,13 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
-    const { data, error } = await supabase.from('events').insert([body]);
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data, { status: 201 });
+    const { app } = getFirebaseAdmin();
+    const db = getFirestore(app);
+    const docRef = await db.collection('events').add({
+        ...body,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+    });
+    const newEvent = { id: docRef.id, ...body };
+    return NextResponse.json(newEvent, { status: 201 });
 }
