@@ -7,11 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test-build": "next build && next start"
+    "test-build": "next build && next start",
+    "export": "next export",
+    "firebase-deploy": "next build && next export && firebase deploy"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.29.12",
-    "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
     "@supabase/supabase-js": "^2.50.3",
     "@tiptap/pm": "^2.24.2",
     "@tiptap/react": "^2.24.2",
