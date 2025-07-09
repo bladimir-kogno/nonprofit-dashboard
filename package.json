@@ -22,7 +22,9 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "xlsx": "^0.18.5",
-    "zod": "^3.25.74"
+    "zod": "^3.25.74",
+    "firebase": "^9.23.0",
+    "firebase-admin": "^11.11.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
