@@ -105,14 +105,16 @@ useEffect(() => {
                             continue;
                         }
 
-                        const contact: Contact = {
-                            id: crypto.randomUUID(),
-                            name: String(row[0] || '').trim(),
-                            company: String(row[1] || '').trim(),
-                            email: String(row[2] || '').trim(),
-                            phone: String(row[3] || '').trim(),
-                            dateAdded: new Date().toISOString().split('T')[0]
-                        };
+                      const contact: Contact = {
+    id: crypto.randomUUID(),
+    name: String(row[0] || '').trim(),
+    company: String(row[1] || '').trim(),
+    email: String(row[2] || '').trim(),
+    phone: String(row[3] || '').trim(),
+    dateAdded: new Date().toISOString().split('T')[0],
+    type: 'subscriber',
+    status: 'active'
+};
 
                         if (contact.name && contact.email) {
                             processedContacts.push(contact);
@@ -121,7 +123,30 @@ useEffect(() => {
                     }
                 }
 
-                setContacts(prev => [...prev, ...processedContacts]);
+               // Save contacts to Firebase
+try {
+    const firebasePromises = processedContacts.map(contact => 
+        ClientEmailRecipientService.create({
+            name: contact.name,
+            email: contact.email,
+            type: contact.type,
+            status: contact.status,
+            metadata: {
+                company: contact.company,
+                phone: contact.phone
+            }
+        })
+    );
+    
+    await Promise.all(firebasePromises);
+    setContacts(prev => [...prev, ...processedContacts]);
+} catch (error) {
+    console.error('Error saving contacts to Firebase:', error);
+    setUploadStatus({ 
+        type: 'error', 
+        message: 'Contacts processed but failed to save some to database.'
+    });
+}
                 setUploadStatus({ 
                     type: 'success', 
                     message: `Successfully imported ${processedContacts.length} contacts${duplicateCount > 0 ? ` (${duplicateCount} duplicates skipped)` : ''}`
