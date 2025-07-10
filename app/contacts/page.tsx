@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Upload, Search, Mail, Phone, Building, User, Download, Trash2, Plus } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import Modal from '../../components/shared/Modal';
+import { EmailRecipientService } from '../../lib/database-models';
+import { useUser } from '@clerk/nextjs';
 
 interface Contact {
     id: string;
