@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Upload, Search, Mail, Phone, Building, User, Download, Trash2, Plus } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import Modal from '../../components/shared/Modal';
-import { ClientEmailRecipientService as EmailRecipientService } from '../../lib/client-database';import { useUser } from '@clerk/nextjs';
+import { EmailRecipientService } from '../../lib/database-models';
 
 interface Contact {
     id: string;
@@ -18,7 +18,6 @@ interface Contact {
 }
 
 export default function ContactsPage() {
-     const { user } = useUser();
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [filteredContacts, setFilteredContacts] = useState<Contact[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -31,31 +30,29 @@ export default function ContactsPage() {
 // Load contacts from Firebase on component mount
 useEffect(() => {
     const loadContacts = async () => {
-        if (user) {
-            try {
-                const firebaseContacts = await EmailRecipientService.getAll();
-                // Convert Firebase format to our Contact format
-                const convertedContacts = firebaseContacts.map(contact => ({
-                    id: contact.id,
-                    name: contact.name,
-                    company: contact.metadata?.company || '',
-                    email: contact.email,
-                    phone: contact.metadata?.phone || '',
-                    dateAdded: contact.created_at?.split('T')[0] || '',
-                    type: contact.type,
-                    status: contact.status
-                }));
-                setContacts(convertedContacts);
-                setFilteredContacts(convertedContacts);
-            } catch (error) {
-                console.error('Error loading contacts:', error);
-                setUploadStatus({ type: 'error', message: 'Failed to load contacts from database.' });
-            }
+        try {
+            const firebaseContacts = await EmailRecipientService.getAll();
+            // Convert Firebase format to our Contact format
+            const convertedContacts = firebaseContacts.map(contact => ({
+                id: contact.id,
+                name: contact.name,
+                company: contact.metadata?.company || '',
+                email: contact.email,
+                phone: contact.metadata?.phone || '',
+                dateAdded: contact.created_at?.split('T')[0] || '',
+                type: contact.type,
+                status: contact.status
+            }));
+            setContacts(convertedContacts);
+            setFilteredContacts(convertedContacts);
+        } catch (error) {
+            console.error('Error loading contacts:', error);
+            setUploadStatus({ type: 'error', message: 'Failed to load contacts from database.' });
         }
     };
     
     loadContacts();
-}, [user]);
+}, []);
 
 
     // Filter contacts based on search term
@@ -217,13 +214,8 @@ try {
    const handleAddContact = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user) {
-        alert('You must be logged in to add contacts.');
-        return;
-    }
-    
-    // Check for duplicate email
-    const existingContact = contacts.find(c => c.email.toLowerCase() === newContactData.email.toLowerCase());
+          // Check for duplicate email
+      const existingContact = contacts.find((c: Contact) => c.email.toLowerCase() === newContactData.email.toLowerCase());
     if (existingContact) {
         alert('A contact with this email already exists.');
         return;
