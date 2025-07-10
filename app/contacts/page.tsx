@@ -126,7 +126,7 @@ useEffect(() => {
                // Save contacts to Firebase
 try {
     const firebasePromises = processedContacts.map(contact => 
-        ClientEmailRecipientService.create({
+        EmailRecipientService.create({
             name: contact.name,
             email: contact.email,
             type: contact.type,
