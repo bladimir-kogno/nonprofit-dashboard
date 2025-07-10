@@ -32,9 +32,12 @@ export default function DonorForm({ onClose, onSuccess }: DonorFormProps) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        console.log('Form submitted with data:', formData);
 
         const result = donorSchema.safeParse(formData);
         if (!result.success) {
+            console.log('Validation failed:', result.error);
             setError('Please fill all required fields correctly.');
             return;
         }
@@ -43,6 +46,7 @@ export default function DonorForm({ onClose, onSuccess }: DonorFormProps) {
         setIsSubmitting(true);
 
         try {
+            console.log('Making API call to /api/donors');
             const response = await fetch('/api/donors', {
                 method: 'POST',
                 headers: {
@@ -51,8 +55,12 @@ export default function DonorForm({ onClose, onSuccess }: DonorFormProps) {
                 body: JSON.stringify(formData),
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+
             if (!response.ok) {
                 const errorData = await response.json();
+                console.log('Error response:', errorData);
                 throw new Error(errorData.error || 'Failed to save donor');
             }
 

@@ -1,6 +1,4 @@
 {
   "/api/donors/route": "app/api/donors/route.js",
-  "/api/send-email/route": "app/api/send-email/route.js",
-  "/api/volunteers/route": "app/api/volunteers/route.js",
-  "/api/events/route": "app/api/events/route.js"
+  "/api/volunteers/route": "app/api/volunteers/route.js"
 }
