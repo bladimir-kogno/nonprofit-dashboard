@@ -7,9 +7,10 @@ import { volunteerSchema } from '@lib/validators';
 
 type VolunteerFormProps = {
     onClose: () => void;
+    onSuccess?: () => void;
 };
 
-export default function VolunteerForm({ onClose }: VolunteerFormProps) {
+export default function VolunteerForm({ onClose, onSuccess }: VolunteerFormProps) {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -20,6 +21,7 @@ export default function VolunteerForm({ onClose }: VolunteerFormProps) {
     });
 
     const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -50,9 +52,43 @@ export default function VolunteerForm({ onClose }: VolunteerFormProps) {
         }
 
         setError(null);
+        setIsSubmitting(true);
 
-        // Submit logic goes here (e.g., call API)
-        onClose();
+        try {
+            const response = await fetch('/api/volunteers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(preparedData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to save volunteer');
+            }
+
+            const savedVolunteer = await response.json();
+            console.log('Volunteer saved successfully:', savedVolunteer);
+            
+            // Reset form
+            setFormData({
+                name: '',
+                email: '',
+                phone: '',
+                skills: '',
+                hoursLogged: 0,
+                active: true,
+            });
+            
+            onSuccess?.();
+            onClose();
+        } catch (error) {
+            console.error('Error saving volunteer:', error);
+            setError(error instanceof Error ? error.message : 'Failed to save volunteer');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -142,14 +178,16 @@ export default function VolunteerForm({ onClose }: VolunteerFormProps) {
                         type="button"
                         onClick={onClose}
                         className="px-4 py-2 border rounded-md"
+                        disabled={isSubmitting}
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                        disabled={isSubmitting}
                     >
-                        Save
+                        {isSubmitting ? 'Saving...' : 'Save'}
                     </button>
                 </div>
             </form>

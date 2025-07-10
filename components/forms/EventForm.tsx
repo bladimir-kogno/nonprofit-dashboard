@@ -7,9 +7,10 @@ import { eventSchema } from '@/lib/validators';
 
 type EventFormProps = {
     onClose: () => void;
+    onSuccess?: () => void;
 };
 
-export default function EventForm({ onClose }: EventFormProps) {
+export default function EventForm({ onClose, onSuccess }: EventFormProps) {
     const [formData, setFormData] = useState({
         title: '',
         date: '',
@@ -20,6 +21,7 @@ export default function EventForm({ onClose }: EventFormProps) {
     });
 
     const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -40,9 +42,43 @@ export default function EventForm({ onClose }: EventFormProps) {
         }
 
         setError(null);
+        setIsSubmitting(true);
 
-        // Submit logic goes here (e.g., call API)
-        onClose();
+        try {
+            const response = await fetch('/api/events', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to save event');
+            }
+
+            const savedEvent = await response.json();
+            console.log('Event saved successfully:', savedEvent);
+            
+            // Reset form
+            setFormData({
+                title: '',
+                date: '',
+                location: '',
+                description: '',
+                status: 'upcoming',
+                attendees: [],
+            });
+            
+            onSuccess?.();
+            onClose();
+        } catch (error) {
+            console.error('Error saving event:', error);
+            setError(error instanceof Error ? error.message : 'Failed to save event');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -121,14 +157,16 @@ export default function EventForm({ onClose }: EventFormProps) {
                         type="button"
                         onClick={onClose}
                         className="px-4 py-2 border rounded-md"
+                        disabled={isSubmitting}
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                        disabled={isSubmitting}
                     >
-                        Save
+                        {isSubmitting ? 'Saving...' : 'Save'}
                     </button>
                 </div>
             </form>
