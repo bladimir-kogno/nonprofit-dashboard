@@ -14,9 +14,12 @@ interface Contact {
     email: string;
     phone: string;
     dateAdded: string;
+    type: 'donor' | 'volunteer' | 'subscriber' | 'event_attendee';
+    status: 'active' | 'unsubscribed' | 'bounced';
 }
 
 export default function ContactsPage() {
+     const { user } = useUser();
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [filteredContacts, setFilteredContacts] = useState<Contact[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -26,22 +29,35 @@ export default function ContactsPage() {
     const [showAddContactModal, setShowAddContactModal] = useState(false);
     const [newContactData, setNewContactData] = useState({ name: '', company: '', email: '', phone: '' });
 
-    // Load contacts from localStorage on component mount
-    useEffect(() => {
-        const savedContacts = localStorage.getItem('nonprofit-contacts');
-        if (savedContacts) {
-            const parsed = JSON.parse(savedContacts);
-            setContacts(parsed);
-            setFilteredContacts(parsed);
+// Load contacts from Firebase on component mount
+useEffect(() => {
+    const loadContacts = async () => {
+        if (user) {
+            try {
+                const firebaseContacts = await EmailRecipientService.getAll();
+                // Convert Firebase format to our Contact format
+                const convertedContacts = firebaseContacts.map(contact => ({
+                    id: contact.id,
+                    name: contact.name,
+                    company: contact.metadata?.company || '',
+                    email: contact.email,
+                    phone: contact.metadata?.phone || '',
+                    dateAdded: contact.created_at?.split('T')[0] || '',
+                    type: contact.type,
+                    status: contact.status
+                }));
+                setContacts(convertedContacts);
+                setFilteredContacts(convertedContacts);
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+                setUploadStatus({ type: 'error', message: 'Failed to load contacts from database.' });
+            }
         }
-    }, []);
+    };
+    
+    loadContacts();
+}, [user]);
 
-    // Save contacts to localStorage whenever contacts change
-    useEffect(() => {
-        if (contacts.length > 0) {
-            localStorage.setItem('nonprofit-contacts', JSON.stringify(contacts));
-        }
-    }, [contacts]);
 
     // Filter contacts based on search term
     useEffect(() => {
@@ -148,43 +164,81 @@ export default function ContactsPage() {
         XLSX.writeFile(workbook, `contacts-${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
-    const handleDeleteContact = (id: string) => {
-        if (confirm('Are you sure you want to delete this contact?')) {
+ const handleDeleteContact = async (id: string) => {
+    if (confirm('Are you sure you want to delete this contact?')) {
+        try {
+            await EmailRecipientService.delete(id);
             setContacts(prev => prev.filter(contact => contact.id !== id));
+            setUploadStatus({ type: 'success', message: 'Contact deleted successfully.' });
+        } catch (error) {
+            console.error('Error deleting contact:', error);
+            setUploadStatus({ type: 'error', message: 'Failed to delete contact.' });
         }
-    };
+    }
+};
 
-    const handleClearAll = () => {
-        if (confirm('Are you sure you want to delete all contacts? This action cannot be undone.')) {
+ const handleClearAll = async () => {
+    if (confirm('Are you sure you want to delete all contacts? This action cannot be undone.')) {
+        try {
+            const contactIds = contacts.map(c => c.id);
+            await EmailRecipientService.bulkDelete(contactIds);
             setContacts([]);
-            localStorage.removeItem('nonprofit-contacts');
+            setUploadStatus({ type: 'success', message: 'All contacts deleted successfully.' });
+        } catch (error) {
+            console.error('Error clearing contacts:', error);
+            setUploadStatus({ type: 'error', message: 'Failed to delete all contacts.' });
         }
-    };
+    }
+};
+   const handleAddContact = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user) {
+        alert('You must be logged in to add contacts.');
+        return;
+    }
+    
+    // Check for duplicate email
+    const existingContact = contacts.find(c => c.email.toLowerCase() === newContactData.email.toLowerCase());
+    if (existingContact) {
+        alert('A contact with this email already exists.');
+        return;
+    }
 
-    const handleAddContact = (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        // Check for duplicate email
-        const existingContact = contacts.find(c => c.email.toLowerCase() === newContactData.email.toLowerCase());
-        if (existingContact) {
-            alert('A contact with this email already exists.');
-            return;
-        }
-
-        const newContact: Contact = {
-            id: crypto.randomUUID(),
+    try {
+        // Create contact in Firebase
+        const newRecipient = await EmailRecipientService.create({
             name: newContactData.name.trim(),
-            company: newContactData.company.trim(),
             email: newContactData.email.trim(),
+            type: 'subscriber', // You can make this dynamic later
+            status: 'active',
+            metadata: {
+                company: newContactData.company.trim(),
+                phone: newContactData.phone.trim()
+            }
+        });
+
+        // Convert to our Contact format and add to state
+        const newContact: Contact = {
+            id: newRecipient.id,
+            name: newRecipient.name,
+            company: newContactData.company.trim(),
+            email: newRecipient.email,
             phone: newContactData.phone.trim(),
-            dateAdded: new Date().toISOString().split('T')[0]
+            dateAdded: newRecipient.created_at?.split('T')[0] || '',
+            type: newRecipient.type,
+            status: newRecipient.status
         };
 
         setContacts(prev => [newContact, ...prev]);
         setShowAddContactModal(false);
         setNewContactData({ name: '', company: '', email: '', phone: '' });
         setUploadStatus({ type: 'success', message: `Successfully added ${newContact.name} to contacts.` });
-    };
+    } catch (error) {
+        console.error('Error adding contact:', error);
+        setUploadStatus({ type: 'error', message: 'Failed to add contact to database.' });
+    }
+};
 
     return (
         <div className="space-y-6">
