@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart3, Heart, Users, Calendar, FileText, Mail, ContactRound } from 'lucide-react';
+import { BarChart3, Heart, Users, Calendar, FileText, Mail, Contact } from 'lucide-react';
 
 const navItems = [
     { label: 'Dashboard', href: '/', icon: BarChart3 },
     { label: 'Donors', href: '/donors', icon: Heart },
     { label: 'Volunteers', href: '/volunteers', icon: Users },
-    { label: 'Contacts', href: '/contacts', icon: ContactRound },
+    { label: 'Contacts', href: '/contacts', icon: Contact },
     { label: 'Events', href: '/events', icon: Calendar },
     { label: 'Email & Newsletter', href: '/emails', icon: Mail },
     { label: 'Reports', href: '/reports', icon: FileText },
