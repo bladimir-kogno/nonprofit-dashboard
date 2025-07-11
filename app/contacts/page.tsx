@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, type ChangeEvent, type FormEvent } from 'react';
-import { Upload, Search, Mail, Phone, Building, User, Download, Trash2, Plus } from 'lucide-react';
+import { Upload, Search, Mail, Phone, Building2 as Building, User, Download, Trash2, Plus } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import Modal from '../../components/shared/Modal';
 import { EmailRecipientService } from '../../lib/database-models';
