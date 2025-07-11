@@ -62,10 +62,9 @@ const loadFirebaseAdmin = () => {
     throw new Error('Firebase Admin SDK should not be loaded in browser');
   }
   if (!getAdminApps) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const adminAppModule = require('firebase-admin/app');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const adminFirestoreModule = require('firebase-admin/firestore');
+    // use eval to avoid static analysis by bundlers
+    const adminAppModule = eval('require')('firebase-admin/app');
+    const adminFirestoreModule = eval('require')('firebase-admin/firestore');
     getAdminApps = adminAppModule.getApps;
     initializeAdminApp = adminAppModule.initializeApp;
     cert = adminAppModule.cert;
