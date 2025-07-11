@@ -1,8 +1,11 @@
-import { FC, SVGProps } from 'react';
-
-type LucideIcon = FC<SVGProps<SVGSVGElement>>;
+// These declarations augment lucide-react to expose the specific icon
+// components we import throughout the project. They do not alter the
+// existing default export.
 
 declare module 'lucide-react' {
+  import { FC, SVGProps } from 'react';
+  type LucideIcon = FC<SVGProps<SVGSVGElement>>;
+
   export const Upload: LucideIcon;
   export const Search: LucideIcon;
   export const Mail: LucideIcon;
@@ -39,7 +42,4 @@ declare module 'lucide-react' {
   export const Code: LucideIcon;
   export const EyeOff: LucideIcon;
   export const X: LucideIcon;
-  // fallback default export
-  const Lucide: Record<string, LucideIcon>;
-  export default Lucide;
 }
