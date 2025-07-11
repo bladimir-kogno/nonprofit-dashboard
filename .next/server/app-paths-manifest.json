@@ -7,8 +7,8 @@
   "/contacts/page": "app/contacts/page.js",
   "/donors/page": "app/donors/page.js",
   "/emails/page": "app/emails/page.js",
-  "/events/page": "app/events/page.js",
   "/page": "app/page.js",
-  "/reports/page": "app/reports/page.js",
-  "/volunteers/page": "app/volunteers/page.js"
+  "/events/page": "app/events/page.js",
+  "/volunteers/page": "app/volunteers/page.js",
+  "/reports/page": "app/reports/page.js"
 }

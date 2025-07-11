@@ -11,6 +11,15 @@ const nextConfig = {
     compress: true,
     images: {
         formats: ['image/avif', 'image/webp'],
+        unoptimized: true, // Required for static export
+    },
+    // Configure for Firebase Hosting static export
+    output: 'export',
+    trailingSlash: true,
+    distDir: 'out',
+    // Disable server-side features for static export
+    experimental: {
+        esmExternals: 'loose',
     },
 };
 
