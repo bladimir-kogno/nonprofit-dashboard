@@ -48,28 +48,49 @@ export function getFirebaseClient(): { app: FirebaseApp, auth: Auth, db: Firesto
 }
 
 // ---------- Server-side SDK ---------- //
-import { getApps as getAdminApps, initializeApp as initializeAdminApp, cert, ServiceAccount, App as AdminApp } from 'firebase-admin/app';
-import { getFirestore as getAdminFirestore, Firestore as AdminFirestore } from 'firebase-admin/firestore';
+// Dynamic import of firebase-admin modules to avoid including in client bundles
+type AdminApp = any;
+type AdminFirestore = any;
+
+let getAdminApps: Function | null = null;
+let initializeAdminApp: Function | null = null;
+let cert: Function | null = null;
+let getAdminFirestore: Function | null = null;
+// Load firebase-admin lazily only in server environments
+const loadFirebaseAdmin = () => {
+  if (typeof window !== 'undefined') {
+    throw new Error('Firebase Admin SDK should not be loaded in browser');
+  }
+  if (!getAdminApps) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const adminAppModule = require('firebase-admin/app');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const adminFirestoreModule = require('firebase-admin/firestore');
+    getAdminApps = adminAppModule.getApps;
+    initializeAdminApp = adminAppModule.initializeApp;
+    cert = adminAppModule.cert;
+    getAdminFirestore = adminFirestoreModule.getFirestore;
+  }
+};
 
 let adminApp: AdminApp | null = null;
 let adminDb: AdminFirestore | null = null;
 
 export function getFirebaseAdmin(): { app: AdminApp, db: AdminFirestore } {
+  loadFirebaseAdmin();
   if (!adminApp) {
-    const existingApps = getAdminApps();
+    const existingApps = (getAdminApps as any)();
     if (existingApps.length) {
       adminApp = existingApps[0];
     } else {
-      // Parse service account JSON from environment variable
       const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
       if (!serviceAccountJson) {
         throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY environment variable is required for server-side Firebase Admin SDK');
       }
-
-      const serviceAccount = JSON.parse(serviceAccountJson) as ServiceAccount;
-      adminApp = initializeAdminApp({ credential: cert(serviceAccount) });
+      const serviceAccount = JSON.parse(serviceAccountJson);
+      adminApp = (initializeAdminApp as any)({ credential: (cert as any)(serviceAccount) });
     }
-    adminDb = getAdminFirestore(adminApp);
+    adminDb = (getAdminFirestore as any)(adminApp);
   }
 
   return { app: adminApp!, db: adminDb! };
