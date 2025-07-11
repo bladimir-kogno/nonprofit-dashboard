@@ -37,7 +37,6 @@
     "types": [
       "node",
       "react",
-      "lucide-react",
       "xlsx",
       "@clerk/nextjs"
     ],
