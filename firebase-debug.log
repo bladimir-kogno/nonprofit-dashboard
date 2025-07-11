@@ -7,3 +7,24 @@
 [debug] [2025-07-11T02:14:13.473Z] ----------------------------------------------------------------------
 [debug] 
 [info] i  The Firebase CLI’s MCP server feature can optionally make use of Gemini in Firebase. Learn more about Gemini in Firebase and how it uses your data: https://firebase.google.com/docs/gemini-in-firebase#how-gemini-in-firebase-uses-your-data 
+[info] 
+[info] i  Firebase optionally collects CLI and Emulator Suite usage and error reporting information to help improve our products. Data is collected in accordance with Google's privacy policy (https://policies.google.com/privacy) and is not used to identify you. 
+[info] 
+[info] i  To change your the preference at any time, run `firebase logout` and `firebase login` again. 
+[debug] [2025-07-11T02:27:28.543Z] >>> [apiv2][query] POST https://auth.firebase.tools/attest [none]
+[debug] [2025-07-11T02:27:28.544Z] >>> [apiv2][body] POST https://auth.firebase.tools/attest {"session_id":"7f4e28e1-4247-4cd4-8e35-1416d442db83"}
+[debug] [2025-07-11T02:27:28.862Z] <<< [apiv2][status] POST https://auth.firebase.tools/attest 200
+[debug] [2025-07-11T02:27:28.862Z] <<< [apiv2][body] POST https://auth.firebase.tools/attest {"token":"cAQVn6SQSPX-O77MLaW0O3euvkM3zUM54JqzGHzCpdo"}
+[info] 
+[info] To sign in to the Firebase CLI:
+[info] 
+[info] 1. Take note of your session ID:
+[info] 
+[info]    7F4E2
+[info] 
+[info] 2. Visit the URL below on any device and follow the instructions to get your code:
+[info] 
+[info]    https://auth.firebase.tools/login?code_challenge=Wc-DUKT_58WbQJQbE09rsypo0_vz0G6z2jlAUu1rr_s&session=7f4e28e1-4247-4cd4-8e35-1416d442db83&attest=cAQVn6SQSPX-O77MLaW0O3euvkM3zUM54JqzGHzCpdo
+[info] 
+[info] 3. Paste or enter the authorization code below once you have it:
+[info] 
