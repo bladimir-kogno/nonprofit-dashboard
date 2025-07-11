@@ -30,6 +30,16 @@ declare module 'lucide-react' {
   export const TrendingUp: LucideIcon;
   export const Clock: LucideIcon;
   export const MapPin: LucideIcon;
+  export const Bold: LucideIcon;
+  export const Italic: LucideIcon;
+  export const List: LucideIcon;
+  export const ListOrdered: LucideIcon;
+  export const Link: LucideIcon;
+  export const Quote: LucideIcon;
+  export const Undo: LucideIcon;
+  export const Redo: LucideIcon;
+  export const Code: LucideIcon;
+  export const EyeOff: LucideIcon;
 }
 
 // Firebase modular SDK re-export stubs (compiler picks real ones, but these silence editors)
