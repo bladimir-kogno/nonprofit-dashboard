@@ -38,8 +38,7 @@
       "react",
       "lucide-react",
       "xlsx",
-      "@clerk/nextjs",
-      "firebase"
+      "@clerk/nextjs"
     ],
     "plugins": [
       {
