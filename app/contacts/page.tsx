@@ -93,7 +93,7 @@ useEffect(() => {
 
                 // Skip the header row and process the data
                 const processedContacts: Contact[] = [];
-                const existingEmails = new Set(contacts.map(c => c.email.toLowerCase()));
+                const existingEmails = new Set(contacts.map((c: Contact) => c.email.toLowerCase()));
                 let duplicateCount = 0;
 
                 for (let i = 1; i < jsonData.length; i++) {
