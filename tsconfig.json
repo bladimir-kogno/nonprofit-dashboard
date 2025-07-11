@@ -33,6 +33,14 @@
         "types/*"
       ]
     },
+    "types": [
+      "node",
+      "react",
+      "lucide-react",
+      "xlsx",
+      "@clerk/nextjs",
+      "firebase"
+    ],
     "plugins": [
       {
         "name": "next"
