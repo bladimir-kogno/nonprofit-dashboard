@@ -31,16 +31,34 @@ export class EmailRecipientService {
   static collectionName = 'email_recipients';
 
   private static getDb(): Firestore {
-    return getFirebaseClient().db;
+    try {
+      const client = getFirebaseClient();
+      console.log('Firebase client initialized successfully');
+      return client.db;
+    } catch (error) {
+      console.error('Failed to initialize Firebase client:', error);
+      throw new Error('Firebase initialization failed. Check your configuration.');
+    }
   }
 
   static async getAll(): Promise<EmailRecipient[]> {
-    const db = this.getDb();
-    const snapshot = await getDocs(collection(db, this.collectionName));
-    return snapshot.docs.map(d => ({ 
-      id: d.id,
-      ...(d.data() as Omit<EmailRecipient, 'id'>)
-    }));
+    try {
+      console.log('Attempting to fetch all email recipients...');
+      const db = this.getDb();
+      const snapshot = await getDocs(collection(db, this.collectionName));
+      console.log(`Successfully fetched ${snapshot.docs.length} recipients`);
+      return snapshot.docs.map(d => ({ 
+        id: d.id,
+        ...(d.data() as Omit<EmailRecipient, 'id'>)
+      }));
+    } catch (error) {
+      console.error('Error fetching email recipients:', error);
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch contacts: ${error.message}`);
+      } else {
+        throw new Error('Failed to fetch contacts: Unknown error');
+      }
+    }
   }
 
   static async getByType(type: EmailRecipient['type']): Promise<EmailRecipient[]> {
@@ -55,18 +73,30 @@ export class EmailRecipientService {
   }
 
   static async create(recipient: Omit<EmailRecipient, 'id'>): Promise<EmailRecipient> {
-    const db = this.getDb();
-    const docRef = await addDoc(collection(db, this.collectionName), {
-      ...recipient,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
-    return { 
-      ...recipient,
-      id: docRef.id,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    try {
+      console.log('Attempting to create new recipient:', recipient.email);
+      const db = this.getDb();
+      const docData = {
+        ...recipient,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      const docRef = await addDoc(collection(db, this.collectionName), docData);
+      console.log('Successfully created recipient with ID:', docRef.id);
+      return { 
+        ...recipient,
+        id: docRef.id,
+        created_at: docData.created_at,
+        updated_at: docData.updated_at,
+      };
+    } catch (error) {
+      console.error('Error creating email recipient:', error);
+      if (error instanceof Error) {
+        throw new Error(`Failed to create contact: ${error.message}`);
+      } else {
+        throw new Error('Failed to create contact: Unknown error');
+      }
+    }
   }
 
   static async bulkImport(recipients: Omit<EmailRecipient, 'id'>[]): Promise<EmailRecipient[]> {

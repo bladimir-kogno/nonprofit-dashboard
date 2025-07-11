@@ -6,6 +6,7 @@ import * as XLSX from 'xlsx';
 import Modal from '../../components/shared/Modal';
 import { EmailRecipientService } from '../../lib/client-database';
 import { useUser } from '@clerk/nextjs';
+import FirebaseDebug from '../../components/debug/FirebaseDebug';
 
 interface Contact {
     id: string;
@@ -506,6 +507,9 @@ try {
                     </div>
                 </form>
             </Modal>
+
+            {/* Debug Component - Remove after testing */}
+            <FirebaseDebug />
         </div>
     );
 }
