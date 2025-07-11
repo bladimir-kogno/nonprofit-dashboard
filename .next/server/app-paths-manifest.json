@@ -1,13 +1,13 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/api/events/route": "app/api/events/route.js",
   "/api/donors/route": "app/api/donors/route.js",
-  "/api/send-email/route": "app/api/send-email/route.js",
+  "/api/events/route": "app/api/events/route.js",
   "/api/volunteers/route": "app/api/volunteers/route.js",
+  "/api/send-email/route": "app/api/send-email/route.js",
   "/contacts/page": "app/contacts/page.js",
   "/donors/page": "app/donors/page.js",
-  "/events/page": "app/events/page.js",
   "/emails/page": "app/emails/page.js",
+  "/events/page": "app/events/page.js",
   "/page": "app/page.js",
   "/reports/page": "app/reports/page.js",
   "/volunteers/page": "app/volunteers/page.js"
