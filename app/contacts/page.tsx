@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type ChangeEvent, type FormEvent } from 'react';
 import { Upload, Search, Mail, Phone, Building, User, Download, Trash2, Plus } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import Modal from '../../components/shared/Modal';
 import { EmailRecipientService } from '@lib/database-models';
+import type { EmailRecipient } from '@lib/database-models';
 import { useUser } from '@clerk/nextjs';
 
 interface Contact {
@@ -36,7 +37,7 @@ useEffect(() => {
             try {
                 const firebaseContacts = await EmailRecipientService.getAll();
                 // Convert Firebase format to our Contact format
-                const convertedContacts = firebaseContacts.map(contact => ({
+                const convertedContacts = firebaseContacts.map((contact: EmailRecipient): Contact => ({
                     id: contact.id,
                     name: contact.name,
                     company: contact.metadata?.company || '',
@@ -64,7 +65,7 @@ useEffect(() => {
         if (searchTerm === '') {
             setFilteredContacts(contacts);
         } else {
-            const filtered = contacts.filter(contact =>
+            const filtered = contacts.filter((contact: Contact) =>
                 contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 contact.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -74,7 +75,7 @@ useEffect(() => {
         }
     }, [searchTerm, contacts]);
 
-    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
@@ -82,7 +83,7 @@ useEffect(() => {
         setUploadStatus({ type: null, message: '' });
 
         const reader = new FileReader();
-        reader.onload = async (e) => {
+        reader.onload = async (e: ProgressEvent<FileReader>) => {
             try {
                 const data = e.target?.result;
                 const workbook = XLSX.read(data, { type: 'binary' });
@@ -126,7 +127,7 @@ useEffect(() => {
 
                // Save contacts to Firebase
 try {
-    const firebasePromises = processedContacts.map(contact => 
+    const firebasePromises = processedContacts.map((contact: Contact) => 
         EmailRecipientService.create({
             name: contact.name,
             email: contact.email,
@@ -140,7 +141,7 @@ try {
     );
     
     await Promise.all(firebasePromises);
-    setContacts(prev => [...prev, ...processedContacts]);
+    setContacts((prev: Contact[]) => [...prev, ...processedContacts]);
 } catch (error) {
     console.error('Error saving contacts to Firebase:', error);
     setUploadStatus({ 
@@ -175,7 +176,7 @@ try {
             return;
         }
 
-        const exportData = contacts.map(contact => ({
+        const exportData = contacts.map((contact: Contact) => ({
             Name: contact.name,
             Company: contact.company,
             Email: contact.email,
@@ -193,7 +194,7 @@ try {
     if (confirm('Are you sure you want to delete this contact?')) {
         try {
             await EmailRecipientService.delete(id);
-            setContacts(prev => prev.filter(contact => contact.id !== id));
+            setContacts((prev: Contact[]) => prev.filter((contact: Contact) => contact.id !== id));
             setUploadStatus({ type: 'success', message: 'Contact deleted successfully.' });
         } catch (error) {
             console.error('Error deleting contact:', error);
@@ -205,7 +206,7 @@ try {
  const handleClearAll = async () => {
     if (confirm('Are you sure you want to delete all contacts? This action cannot be undone.')) {
         try {
-            const contactIds = contacts.map(c => c.id);
+            const contactIds = contacts.map((c: Contact) => c.id);
             await EmailRecipientService.bulkDelete(contactIds);
             setContacts([]);
             setUploadStatus({ type: 'success', message: 'All contacts deleted successfully.' });
@@ -215,7 +216,7 @@ try {
         }
     }
 };
-   const handleAddContact = async (e: React.FormEvent) => {
+   const handleAddContact = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!user) {
@@ -224,7 +225,7 @@ try {
     }
     
     // Check for duplicate email
-    const existingContact = contacts.find(c => c.email.toLowerCase() === newContactData.email.toLowerCase());
+    const existingContact = contacts.find((c: Contact) => c.email.toLowerCase() === newContactData.email.toLowerCase());
     if (existingContact) {
         alert('A contact with this email already exists.');
         return;
@@ -255,7 +256,7 @@ try {
             status: newRecipient.status
         };
 
-        setContacts(prev => [newContact, ...prev]);
+        setContacts((prev: Contact[]) => [newContact, ...prev]);
         setShowAddContactModal(false);
         setNewContactData({ name: '', company: '', email: '', phone: '' });
         setUploadStatus({ type: 'success', message: `Successfully added ${newContact.name} to contacts.` });
@@ -369,7 +370,7 @@ try {
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {filteredContacts.map((contact) => (
+                                {filteredContacts.map((contact: Contact) => (
                                     <tr key={contact.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
