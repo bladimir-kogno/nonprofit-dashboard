@@ -36,3 +36,6 @@ next-env.d.ts
 # IDE
 .vscode/
 .idea/
+google-cloud-sdk/
+google-cloud-sdk-*.tar.gz
+.next/
